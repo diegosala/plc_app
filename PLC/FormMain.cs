@@ -13,17 +13,23 @@ using MySql.Data.MySqlClient;
 using OPC.Common;
 using OPC.Data.Interface;
 using OPC.Data;
+using System.Collections;
+
+using PLC.Config;
+using PLC.Domain;
 
 namespace PLC
 {
     public partial class FormMain : Form
     {
         private OpcServer servidor;
-        private OpcGroup grupo;
-        private OPCItemDef[] item;  
-        private OPCItemResult[] itemResult;
+        private OPCItemResult[] itemResults;
+        private OpcGroup gruposOPC;
 
         private Conexion conexion;
+
+        private LogConfig configuracion;
+        private ConfigReader configReader;
 
         public FormMain(Conexion conexion)
         {
@@ -33,6 +39,7 @@ namespace PLC
 
         private void btnEmpezar_Click(object sender, EventArgs e)
         {
+            /*
             EstadoItem estado = new EstadoItem(leerValor());
             txtUltimaLectura.Text = DateTime.Now.ToString("MMMM dd, yyyy H:mm:ss");
  
@@ -43,7 +50,7 @@ namespace PLC
             }
             
             txtValor.Text = estado.getTextoEstadoItem();
-            
+            */
             MySqlConnection conn = new MySqlConnection("server=localhost;user=root;database=plc;port=3306;password=;");
 
             conn.Open();
@@ -57,85 +64,70 @@ namespace PLC
         }
 
         private void btnConectar_Click(object sender, EventArgs e)
-        {
+        {            
             try
             {
                 servidor = new OpcServer();
                 servidor.Connect(txtServidor.Text);
 
-                btnConectar.Enabled = false;
-                btnAgregarGrupo.Enabled = true;
-                btnAgregarItem.Enabled = false;
+                btnConectar.Enabled = false;                
                 btnEmpezar.Enabled = false;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "No se pudo conectar al servidor OPC");
+                btnConectar.Enabled = true;                
+                btnEmpezar.Enabled = false;
+                return;
+            }
+
+            try
+            {
+                configReader = new ConfigReader();
+                configuracion.setGrupos(configReader.getGrupos(conexion.getConexion()));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "No se pudo cargar la configuración");
                 btnConectar.Enabled = true;
-                btnAgregarGrupo.Enabled = false;
-                btnAgregarItem.Enabled = false;
                 btnEmpezar.Enabled = false;
+                return;
+            }
+
+            foreach (LogOPCGroup grupo in configuracion.getGrupos().Values) {
+                gruposOPC = servidor.AddGroup(grupo.nombre, true, 900);
+                OPCItemDef[] itemsOPC = new OPCItemDef[grupo.items.Count];
+                
+                int nroItem = 0;
+
+                gruposOPC.SetEnable(true);
+                gruposOPC.Active = true;
+                
+                foreach (LogOPCItem item in grupo.items)
+                {
+                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, 1234, System.Runtime.InteropServices.VarEnum.VT_EMPTY);                    
+                }
+
+                gruposOPC.AddItems(itemsOPC, out itemResults);
             }
         }
 
-        private void btnAgregarGrupo_Click(object sender, EventArgs e)
+        private HashSet<OPCItemState[]> leerValor()
         {
-            try
+            HashSet<OPCItemState[]> estados = new HashSet<OPCItemState[]>();
+
+            int[] arrHSrv = new int[itemResults.Length];
+
+            for (int i = 0; i < itemResults.Length; i++)
             {
-                grupo = servidor.AddGroup(txtGrupo.Text, false, 900);
-                grupo.SetEnable(true);
-                grupo.Active = true;
-                item = new OPCItemDef[1];
+                arrHSrv[i] = itemResults[i].HandleServer;
+                OPCItemState[] estado;
 
-                btnConectar.Enabled = false;
-                btnAgregarGrupo.Enabled = false;
-                btnAgregarItem.Enabled = true;
-                btnEmpezar.Enabled = false;
+                gruposOPC.SyncRead(OPCDATASOURCE.OPC_DS_DEVICE, arrHSrv, out estado);
+                estados.Add(estado);
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "No se pudo agregar el grupo");
-                btnConectar.Enabled = false;
-                btnAgregarGrupo.Enabled = true;
-                btnAgregarItem.Enabled = false;
-                btnEmpezar.Enabled = false;
-            }
-        }
 
-        private void btnAgregarItem_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                item[0] = new OPCItemDef(txtItem.Text, true, 1234, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
-                grupo.AddItems(item, out itemResult);
-
-                if (itemResult[0].Error != 0)
-                    throw new Exception("Error " + itemResult[0].Error + " al agregar el item");
-
-                btnConectar.Enabled = false;
-                btnAgregarGrupo.Enabled = false;
-                btnAgregarItem.Enabled = false;
-                btnEmpezar.Enabled = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "No se pudo agregar el item");
-                btnConectar.Enabled = false;
-                btnAgregarGrupo.Enabled = false;
-                btnAgregarItem.Enabled = true;
-                btnEmpezar.Enabled = false;
-            }
-        }
-
-        private OPCItemState leerValor()
-        {
-            int[] arrHSrv = new int[1];
-            arrHSrv[0] = itemResult[0].HandleServer;
-            OPCItemState[] estado;
-
-            grupo.SyncRead(OPCDATASOURCE.OPC_DS_DEVICE, arrHSrv, out estado);
-
-            return estado[0];
+            return estados;
         }
 
     }
