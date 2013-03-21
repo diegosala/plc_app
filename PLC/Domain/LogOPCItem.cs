@@ -7,6 +7,11 @@ namespace PLC.Domain
 {
     class LogOPCItem : BussinesObject
     {
-        public virtual String nombre { get; set; }     
+        public virtual String nombre { get; set; }
+
+        public LogOPCItem(Int32 id)
+        {
+            this.Id = id;
+        }
     }
 }

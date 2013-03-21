@@ -18,6 +18,9 @@ using OPC.Data;
 using PLC.Config;
 using PLC.Domain;
 
+using System.Timers;
+using PLC.DAO;
+
 namespace PLC
 {
     public partial class FormMain : Form
@@ -28,7 +31,9 @@ namespace PLC
 
         private Conexion conexion;
 
-        private LogConfig configuracion;      
+        private LogConfig configuracion;
+
+        private System.Timers.Timer timer;
 
         public FormMain(Conexion conexion)
         {
@@ -80,31 +85,64 @@ namespace PLC
                 
                 foreach (LogOPCItem item in grupo.items)
                 {
-                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, 1234, System.Runtime.InteropServices.VarEnum.VT_EMPTY);                    
+                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id, System.Runtime.InteropServices.VarEnum.VT_EMPTY);                    
                 }
 
                 gruposOPC.AddItems(itemsOPC, out itemResults);
             }
 
+            timer = new System.Timers.Timer();            
+            timer.Interval = 1000;
+            timer.Enabled = true;
+            timer.Elapsed += new ElapsedEventHandler(leerValores);
+                
             lblEstado.Text = "Conectado a servidor OPC";
         }
 
-        private HashSet<OPCItemState[]> leerValor()
+        private void leerValores(object source, ElapsedEventArgs e)
         {
+            timer.Enabled = false;
             HashSet<OPCItemState[]> estados = new HashSet<OPCItemState[]>();
+
+            LogHeaderDAO daoHeader = new LogHeaderDAO(conexion);
+            LogItemDAO daoItem = new LogItemDAO(conexion);
+            int idHeader, estadoCont = 0;
 
             int[] arrHSrv = new int[itemResults.Length];
 
             for (int i = 0; i < itemResults.Length; i++)
             {
                 arrHSrv[i] = itemResults[i].HandleServer;
-                OPCItemState[] estado;
+                OPCItemState[] arrayEstado;
 
-                gruposOPC.SyncRead(OPCDATASOURCE.OPC_DS_DEVICE, arrHSrv, out estado);
-                estados.Add(estado);
+                gruposOPC.SyncRead(OPCDATASOURCE.OPC_DS_DEVICE, arrHSrv, out arrayEstado);
+                estados.Add(arrayEstado);
             }
 
-            return estados;
+            if (estados.Count == 0)
+            {
+                timer.Enabled = true;
+                return;
+            }
+
+            idHeader = daoHeader.saveLogHeader("Diego", "1234");
+
+            if (idHeader == -1)
+            {
+                timer.Enabled = true;
+                return;
+            }
+            
+            foreach (OPCItemState[] estado in estados)
+            {
+                if (estado[estadoCont].Error == 0)
+                {
+                    daoItem.saveLoggedItem(idHeader, new LogOPCItem(estado[estadoCont].HandleClient), estado[estadoCont].DataValue == null ? "" : estado[estadoCont].DataValue.ToString());
+                    estadoCont++;
+                }
+            }
+
+            timer.Enabled = true;
         }
 
     }

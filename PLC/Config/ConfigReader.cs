@@ -19,29 +19,35 @@ namespace PLC
             MySqlCommand query = new MySqlCommand("SELECT * FROM v_config", conexion);
             MySqlDataReader reader = query.ExecuteReader();
 
-            while (reader.Read())
+            try
             {
-                LogOPCGroup grupo;
-                int idGrupo = int.Parse(reader[0].ToString());
-
-                if (!grupos.ContainsKey(idGrupo))
+                while (reader.Read())
                 {
-                    grupo = new LogOPCGroup();
-                    grupo.Id = idGrupo;
-                    grupo.nombre = reader[1].ToString();
-                    grupo.items = new HashSet<LogOPCItem>();
-                    grupos.Add(idGrupo, grupo);
-                }
-                else
-                {
-                    grupos.TryGetValue(idGrupo, out grupo);
-                }
+                    LogOPCGroup grupo;
+                    int idGrupo = int.Parse(reader[0].ToString());
 
-                LogOPCItem item = new LogOPCItem();
-                item.Id = int.Parse(reader[2].ToString());
-                item.nombre = reader[3].ToString();
+                    if (!grupos.ContainsKey(idGrupo))
+                    {
+                        grupo = new LogOPCGroup();
+                        grupo.Id = idGrupo;
+                        grupo.nombre = reader[1].ToString();
+                        grupo.items = new HashSet<LogOPCItem>();
+                        grupos.Add(idGrupo, grupo);
+                    }
+                    else
+                    {
+                        grupos.TryGetValue(idGrupo, out grupo);
+                    }
 
-                grupo.items.Add(item);
+                    LogOPCItem item = new LogOPCItem(int.Parse(reader[2].ToString()));                    
+                    item.nombre = reader[3].ToString();
+
+                    grupo.items.Add(item);
+                }
+            }
+            finally
+            {
+                reader.Close();
             }
 
             return grupos;

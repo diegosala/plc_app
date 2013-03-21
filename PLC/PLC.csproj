@@ -51,7 +51,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conexion.cs" />
-    <Compile Include="Domain\ConfigReader.cs" />
+    <Compile Include="DAO\LogHeaderDAO.cs" />
+    <Compile Include="Domain\OPCItem.cs" />
+    <Compile Include="DAO\LogItemDAO.cs" />
+    <Compile Include="Config\ConfigReader.cs" />
     <Compile Include="Config\LogConfig.cs" />
     <Compile Include="Domain\BussinesObject.cs" />
     <Compile Include="Domain\LogOPCGroup.cs" />
