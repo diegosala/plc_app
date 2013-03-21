@@ -10,14 +10,14 @@ namespace PLC.Config
     class LogConfig
     {
         private HashSet<LogOPCItem> items;
-        private Dictionary<Int32, LogOPCGroup> grupos;
+        private IDictionary<Int32, LogOPCGroup> grupos;
 
-        public Dictionary<Int32, LogOPCGroup> getGrupos()
+        public IDictionary<Int32, LogOPCGroup> getGrupos()
         {
             return grupos;
         }
 
-        public void setGrupos(Dictionary<Int32, LogOPCGroup> grupos)
+        public void setGrupos(IDictionary<Int32, LogOPCGroup> grupos)
         {
             this.grupos = grupos;
         }

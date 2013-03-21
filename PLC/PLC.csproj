@@ -51,7 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conexion.cs" />
-    <Compile Include="Config\ConfigReader.cs" />
+    <Compile Include="Domain\ConfigReader.cs" />
     <Compile Include="Config\LogConfig.cs" />
     <Compile Include="Domain\BussinesObject.cs" />
     <Compile Include="Domain\LogOPCGroup.cs" />

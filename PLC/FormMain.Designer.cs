@@ -28,24 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnEmpezar = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.txtServidor = new System.Windows.Forms.TextBox();
             this.btnConectar = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
-            this.txtValor = new System.Windows.Forms.TextBox();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.lblEstado = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // btnEmpezar
-            // 
-            this.btnEmpezar.Enabled = false;
-            this.btnEmpezar.Location = new System.Drawing.Point(12, 68);
-            this.btnEmpezar.Name = "btnEmpezar";
-            this.btnEmpezar.Size = new System.Drawing.Size(260, 36);
-            this.btnEmpezar.TabIndex = 0;
-            this.btnEmpezar.Text = "Leer";
-            this.btnEmpezar.UseVisualStyleBackColor = true;
-            this.btnEmpezar.Click += new System.EventHandler(this.btnEmpezar_Click);
             // 
             // label1
             // 
@@ -74,35 +63,41 @@
             this.btnConectar.UseVisualStyleBackColor = true;
             this.btnConectar.Click += new System.EventHandler(this.btnConectar_Click);
             // 
-            // label4
+            // statusStrip1
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 113);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(55, 13);
-            this.label4.TabIndex = 10;
-            this.label4.Text = "Mensajes:";
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblEstado});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 72);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(279, 22);
+            this.statusStrip1.SizingGrip = false;
+            this.statusStrip1.TabIndex = 12;
+            this.statusStrip1.Text = "statusStrip1";
             // 
-            // txtValor
+            // lblEstado
             // 
-            this.txtValor.Location = new System.Drawing.Point(73, 110);
-            this.txtValor.Name = "txtValor";
-            this.txtValor.Size = new System.Drawing.Size(199, 20);
-            this.txtValor.TabIndex = 11;
+            this.lblEstado.Name = "lblEstado";
+            this.lblEstado.Size = new System.Drawing.Size(49, 17);
+            this.lblEstado.Text = "Inactivo";
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(279, 141);
-            this.Controls.Add(this.txtValor);
-            this.Controls.Add(this.label4);
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.ClientSize = new System.Drawing.Size(279, 94);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.btnConectar);
             this.Controls.Add(this.txtServidor);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.btnEmpezar);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "FormMain";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Log PLC";
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -110,12 +105,11 @@
 
         #endregion
 
-        private System.Windows.Forms.Button btnEmpezar;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtServidor;
         private System.Windows.Forms.Button btnConectar;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox txtValor;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel lblEstado;
     }
 }
 

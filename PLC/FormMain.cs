@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Collections;
 
 using MySql.Data;
 using MySql.Data.MySqlClient;
@@ -13,7 +14,6 @@ using MySql.Data.MySqlClient;
 using OPC.Common;
 using OPC.Data.Interface;
 using OPC.Data;
-using System.Collections;
 
 using PLC.Config;
 using PLC.Domain;
@@ -28,8 +28,7 @@ namespace PLC
 
         private Conexion conexion;
 
-        private LogConfig configuracion;
-        private ConfigReader configReader;
+        private LogConfig configuracion;      
 
         public FormMain(Conexion conexion)
         {
@@ -37,60 +36,36 @@ namespace PLC
             this.conexion = conexion;
         }
 
-        private void btnEmpezar_Click(object sender, EventArgs e)
-        {
-            /*
-            EstadoItem estado = new EstadoItem(leerValor());
-            txtUltimaLectura.Text = DateTime.Now.ToString("MMMM dd, yyyy H:mm:ss");
- 
-            if (estado.getCalidadItem() != 192)
-            {
-                txtValor.Text = "MAL";
-                return;
-            }
-            
-            txtValor.Text = estado.getTextoEstadoItem();
-            */
-            MySqlConnection conn = new MySqlConnection("server=localhost;user=root;database=plc;port=3306;password=;");
-
-            conn.Open();
-
-            MySqlCommand cmd = new MySqlCommand("INSERT INTO log_table (data) VALUES (@VariableData)", conn);
-            cmd.Parameters.AddWithValue("@VariableData", txtValor.Text);
-            cmd.ExecuteNonQuery();
-
-
-            conn.Close();
-        }
-
         private void btnConectar_Click(object sender, EventArgs e)
         {            
+            ConfigReader configReader = new ConfigReader();            
             try
             {
                 servidor = new OpcServer();
                 servidor.Connect(txtServidor.Text);
 
-                btnConectar.Enabled = false;                
-                btnEmpezar.Enabled = false;
+                btnConectar.Enabled = false;                                
+                lblEstado.Text = "Conectando a servidor OPC...";
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "No se pudo conectar al servidor OPC");
+                MessageBox.Show(ex.Message, "No se pudo conectar al servidor OPC", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 btnConectar.Enabled = true;                
-                btnEmpezar.Enabled = false;
+                lblEstado.Text = "Inactivo";
                 return;
             }
-
+            
             try
             {
-                configReader = new ConfigReader();
-                configuracion.setGrupos(configReader.getGrupos(conexion.getConexion()));
+                lblEstado.Text = "Cargando configuración...";
+                configuracion = new LogConfig();
+                configuracion.setGrupos(configReader.getGrupos(conexion.getConexion()));                
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "No se pudo cargar la configuración");
+                MessageBox.Show(ex.Message, "No se pudo cargar la configuración", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 btnConectar.Enabled = true;
-                btnEmpezar.Enabled = false;
+                lblEstado.Text = "Inactivo";
                 return;
             }
 
@@ -110,6 +85,8 @@ namespace PLC
 
                 gruposOPC.AddItems(itemsOPC, out itemResults);
             }
+
+            lblEstado.Text = "Conectado a servidor OPC";
         }
 
         private HashSet<OPCItemState[]> leerValor()
