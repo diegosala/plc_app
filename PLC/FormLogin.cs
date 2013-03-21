@@ -47,7 +47,11 @@ namespace PLC
 
         private void getConexion(object sender, DoWorkEventArgs e)
         {
-            e.Result = new Conexion(txtHost.Text, txtPuerto.Text, txtDB.Text, txtUsuario.Text, txtPassword.Text);
+            Conexion cnx = new Conexion(txtHost.Text, txtPuerto.Text, txtDB.Text, txtUsuario.Text, txtPassword.Text);
+            if (cnx.getConexion() == null)
+                 e.Result = "No se ha podido conectar con la base de datos";
+            else
+                e.Result = cnx;
         }
 
         private void progressBarUpdater(string text)
@@ -74,7 +78,7 @@ namespace PLC
             if (e.Result != null && e.Result is string)
             {
                 prgBar.Visible = false;
-                MessageBox.Show(this, e.Result as string, "Se ha producido un error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(this, e.Result as string, "Error al iniciar la aplicación", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             if (e.Result != null && e.Result is Conexion)

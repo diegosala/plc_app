@@ -46,11 +46,20 @@ namespace PLC
             ConfigReader configReader = new ConfigReader();            
             try
             {
+                SERVERSTATUS estadoServidor;
                 servidor = new OpcServer();
                 servidor.Connect(txtServidor.Text);
+                servidor.GetStatus(out estadoServidor);
 
-                btnConectar.Enabled = false;                                
-                lblEstado.Text = "Conectando a servidor OPC...";
+                if (estadoServidor.eServerState == OPCSERVERSTATE.OPC_STATUS_RUNNING)
+                {
+                    btnConectar.Enabled = false;
+                    lblEstado.Text = "Conectando a servidor OPC...";
+                }
+                else
+                {
+                    throw new Exception("Error");
+                }
             }
             catch (Exception ex)
             {

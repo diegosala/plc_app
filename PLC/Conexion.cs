@@ -33,7 +33,15 @@ namespace PLC
             if (conexion != null)
                 return conexion;
             conexion = new MySqlConnection("server="+ host +";user="+ usuario +";database="+ db +";port="+ puerto +";password="+ password +";");
-            conexion.Open();
+            try
+            {
+                conexion.Open();
+            }
+            catch
+            {
+                conexion = null;
+            }
+
             return conexion;
         }
 
