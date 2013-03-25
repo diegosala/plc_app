@@ -10,9 +10,9 @@ namespace PLC.DAO
     {
         private MySqlConnection conexion;
 
-        public LogHeaderDAO(Conexion conexion)
+        public LogHeaderDAO(MySqlConnection conexion)
         {
-            this.conexion = conexion.getConexion();
+            this.conexion = conexion;
         }
 
         public int saveLogHeader(String nombre, String lote)

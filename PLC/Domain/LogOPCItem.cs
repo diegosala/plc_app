@@ -9,6 +9,8 @@ namespace PLC.Domain
     {
         public virtual String nombre { get; set; }
 
+        public LogOPCItem() { }
+
         public LogOPCItem(Int32 id)
         {
             this.Id = id;

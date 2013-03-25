@@ -12,9 +12,9 @@ namespace PLC.Config
         private HashSet<LogOPCItem> items;
         private IDictionary<Int32, LogOPCGroup> grupos;
 
-        private LogOPCItem itemOnline;
-        private LogOPCItem itemReadEnable;
-        private LogOPCItem itemMemoryPointer;
+        public LogOPCItem itemOnline;
+        public LogOPCItem itemReadEnable;
+        public LogOPCItem itemMemoryPointer;
 
         public IDictionary<Int32, LogOPCGroup> getGrupos()
         {
