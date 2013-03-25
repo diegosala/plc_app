@@ -12,6 +12,10 @@ namespace PLC.Config
         private HashSet<LogOPCItem> items;
         private IDictionary<Int32, LogOPCGroup> grupos;
 
+        private LogOPCItem itemOnline;
+        private LogOPCItem itemReadEnable;
+        private LogOPCItem itemMemoryPointer;
+
         public IDictionary<Int32, LogOPCGroup> getGrupos()
         {
             return grupos;
@@ -27,6 +31,21 @@ namespace PLC.Config
             LogOPCGroup grupo;
             grupos.TryGetValue(idGrupo, out grupo);
             return grupo.items;
+        }
+
+        public void setItemOnLine(LogOPCItem item)
+        {
+            itemOnline = item;
+        }
+
+        public void setItemReadEnable(LogOPCItem item)
+        {
+            itemReadEnable = item;
+        }
+
+        public void setItemMemoryPointer(LogOPCItem item)
+        {
+            itemMemoryPointer = item;
         }
     }
 }

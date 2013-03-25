@@ -16,7 +16,7 @@ namespace PLC
         {
             Dictionary<Int32, LogOPCGroup> grupos = new Dictionary<Int32, LogOPCGroup>();            
 
-            MySqlCommand query = new MySqlCommand("SELECT * FROM v_config", conexion);
+            MySqlCommand query = new MySqlCommand("SELECT * FROM v_config_items", conexion);
             MySqlDataReader reader = query.ExecuteReader();
 
             try
