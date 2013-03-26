@@ -8,6 +8,8 @@ namespace PLC.Domain
     class LogOPCItem : BussinesObject
     {
         public virtual String nombre { get; set; }
+        public virtual int bloque { get; set; }
+        public virtual String valor { get; set; }
 
         public LogOPCItem() { }
 

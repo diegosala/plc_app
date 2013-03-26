@@ -11,46 +11,47 @@ using PLC.DAO;
 
 namespace PLC
 {
-    class ConfigDAO
+    class ConfigDAO : LogDAO
     {
         public enum IdItemsControl { OL = 1, RE = 2, MP = 3 };
 
+        public ConfigDAO(MySqlConnection conexion) : base(conexion) { }        
+
         public LogOPCItem getItemConfiguracion(IdItemsControl idItemControl, MySqlConnection conexion)
         {
-            return new LogItemDAO(conexion).getLogItemControl((int)idItemControl);
-        }
-
-        public Dictionary<Int32, LogOPCGroup> getGrupos(MySqlConnection conexion)
-        {
-            Dictionary<Int32, LogOPCGroup> grupos = new Dictionary<Int32, LogOPCGroup>();            
-
-            MySqlCommand query = new MySqlCommand("SELECT * FROM v_config_items", conexion);
+            LogOPCItem item = null;
+            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_item_configuracion WHERE id = " + (int)idItemControl, conexion);
             MySqlDataReader reader = query.ExecuteReader();
 
             try
             {
                 while (reader.Read())
                 {
-                    LogOPCGroup grupo;
-                    int idGrupo = int.Parse(reader[0].ToString());
+                    item = new LogOPCItem();
+                    item.Id = (int)reader[0];
+                    item.nombre = (String)reader[2];
+                }
 
-                    if (!grupos.ContainsKey(idGrupo))
-                    {
-                        grupo = new LogOPCGroup();
-                        grupo.Id = idGrupo;
-                        grupo.nombre = reader[1].ToString();
-                        grupo.items = new HashSet<LogOPCItem>();
-                        grupos.Add(idGrupo, grupo);
-                    }
-                    else
-                    {
-                        grupos.TryGetValue(idGrupo, out grupo);
-                    }
+                return item;
+            }
+            finally
+            {
+                reader.Close();
+            }
+        }
 
-                    LogOPCItem item = new LogOPCItem(int.Parse(reader[2].ToString()));                    
-                    item.nombre = reader[3].ToString();
+        public LogOPCGrupo getGrupoConfiguracion()
+        {
+            LogOPCGrupo grupo = null;
+            MySqlCommand query = new MySqlCommand("SELECT d_grupo_opc FROM plc_item_configuracion LIMIT 0,1", conexion);
+            MySqlDataReader reader = query.ExecuteReader();
 
-                    grupo.items.Add(item);
+            try
+            {
+                while (reader.Read())
+                {
+                    grupo = new LogOPCGrupo();
+                    grupo.nombre = (String)reader[0];
                 }
             }
             finally
@@ -58,7 +59,32 @@ namespace PLC
                 reader.Close();
             }
 
-            return grupos;
+            return grupo;
+        }
+
+        public List<LogOPCItem> getItemsConfiguracion()
+        {
+            List<LogOPCItem> items = new List<LogOPCItem>();
+            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_item_configuracion", conexion);
+            MySqlDataReader reader = query.ExecuteReader();
+
+            try
+            {
+                while (reader.Read())
+                {
+                    LogOPCItem item = new LogOPCItem();
+                    item.Id = (int)reader[0];
+                    item.nombre = (String)reader[2];
+
+                    items.Add(item);
+                }
+            }
+            finally
+            {
+                reader.Close();
+            }
+
+            return items;
         }
     }
 }

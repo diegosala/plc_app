@@ -51,13 +51,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conexion.cs" />
+    <Compile Include="DAO\LogDAO.cs" />
     <Compile Include="DAO\LogHeaderDAO.cs" />
-    <Compile Include="Domain\OPCItem.cs" />
-    <Compile Include="DAO\LogItemDAO.cs" />
+    <Compile Include="DAO\LogOPCGrupoDAO.cs" />
+    <Compile Include="DAO\LogOPCItemDAO.cs" />
     <Compile Include="DAO\ConfigDAO.cs" />
-    <Compile Include="Config\LogConfig.cs" />
+    <Compile Include="Config\ControlConfig.cs" />
+    <Compile Include="DAO\LogRowDAO.cs" />
     <Compile Include="Domain\BussinesObject.cs" />
-    <Compile Include="Domain\LogOPCGroup.cs" />
+    <Compile Include="Domain\LogOPCGrupo.cs" />
     <Compile Include="Domain\LogOPCItem.cs" />
     <Compile Include="Helper\EstadoItem.cs" />
     <Compile Include="FormMain.cs">

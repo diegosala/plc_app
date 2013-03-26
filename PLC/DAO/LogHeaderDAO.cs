@@ -6,22 +6,15 @@ using MySql.Data.MySqlClient;
 
 namespace PLC.DAO
 {
-    class LogHeaderDAO
+    class LogHeaderDAO : LogDAO
     {
-        private MySqlConnection conexion;
+        public LogHeaderDAO(MySqlConnection conexion) : base(conexion) { }
 
-        public LogHeaderDAO(MySqlConnection conexion)
-        {
-            this.conexion = conexion;
-        }
-
-        public int saveLogHeader(String nombre, String lote)
+        public int saveLogHeader()
         {
             int idHeader = -1;
 
-            MySqlCommand cmd = new MySqlCommand("INSERT INTO log_header(nombre, lote) VALUES (@Nombre, @Lote)", conexion);
-            cmd.Parameters.AddWithValue("@Nombre", nombre);
-            cmd.Parameters.AddWithValue("@Lote", lote);
+            MySqlCommand cmd = new MySqlCommand("INSERT INTO plc_proceso(id_tipo_proceso) VALUES (1)", conexion);            
             if (cmd.ExecuteNonQuery() != 1)
                 return idHeader;
 
