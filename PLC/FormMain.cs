@@ -161,14 +161,17 @@ namespace PLC
             setOnline();
 
             // Si RE = 0
-            if (configuracion.getItemReadEnable().valor == "0")
+            //if (configuracion.getItemReadEnable().valor == "0")
+            if(false)
                 return; // No hace nada
 
             // Si RE = 1
-            if (configuracion.getItemReadEnable().valor == "1")
+            //if (configuracion.getItemReadEnable().valor == "1")
+            if(true)
             {
                 // Consultar MP, si es diferente de 0
-                int mp = int.Parse(configuracion.getItemMemoryPointer().valor);
+                //int mp = int.Parse(configuracion.getItemMemoryPointer().valor);
+                int mp = 1;
                 if (mp > 0 && mp <= 5)
                 {
                     List<LogOPCItem> itemsProceso = leerBloque(mp);
@@ -195,25 +198,27 @@ namespace PLC
 
         private List<LogOPCItem> leerBloque(int idBloque)
         {
+            int nBloque = idBloque;
+            idBloque--;
             OpcGroup grupoBloque = this.OpcGroups[idBloque];
-            List<LogOPCItem> itemsBloque = new LogOPCItemDAO(conexion.getConexion()).getItemsByBloque(idBloque);
+            List<LogOPCItem> itemsBloque = new LogOPCItemDAO(conexion.getConexion()).getItemsByBloque(nBloque);
 
             int[] arrHSrv = new int[OPCItemResults[idBloque].Length];
 
             OPCItemState[] arrayEstado = new OPCItemState[OPCItemResults[idBloque].Length];
             for (int i = 0; i < OPCItemResults[idBloque].Length; i++)
             {
-                arrHSrv[i] = OPCItemResults[idBloque][i].HandleServer;
-
-                OpcGroups[idBloque].SyncRead(OPCDATASOURCE.OPC_DS_DEVICE, arrHSrv, out arrayEstado);
+                arrHSrv[i] = OPCItemResults[idBloque][i].HandleServer;                
             }
+
+            OpcGroups[idBloque].SyncRead(OPCDATASOURCE.OPC_DS_DEVICE, arrHSrv, out arrayEstado);
 
             foreach (LogOPCItem item in itemsBloque)
             {
                 for (int i = 0; i < arrayEstado.Length; i++)
                 {
                     if (arrayEstado[i].HandleClient == item.Id)
-                        item.valor = arrayEstado[i].DataValue.ToString();
+                        item.valor = arrayEstado[i].DataValue == null ? "BAD" : arrayEstado[i].DataValue.ToString();
                 }
             }
 
@@ -234,19 +239,21 @@ namespace PLC
             int estadoControlCont = 0;
             for (int i = 0; i < 3; i++)
             {
+                object dataValue = arrayEstadoControl[estadoControlCont].DataValue;
+                String dataValueString = dataValue == null ? "BAD" : dataValue.ToString();
                 switch (arrayEstadoControl[estadoControlCont].HandleClient)
                 {
                     case (int)ConfigDAO.IdItemsControl.MP + 1000:
-                        updateMemoryPos(arrayEstadoControl[estadoControlCont].DataValue == null ? "BAD" : arrayEstadoControl[estadoControlCont].DataValue.ToString());
-                        configuracion.getItemMemoryPointer().valor = arrayEstadoControl[estadoControlCont].DataValue.ToString();
+                        updateMemoryPos(dataValueString);
+                        configuracion.getItemMemoryPointer().valor = dataValueString;
                         break;
                     case (int)ConfigDAO.IdItemsControl.OL + 1000:
-                        updateOnline(arrayEstadoControl[estadoControlCont].DataValue == null ? "BAD" : arrayEstadoControl[estadoControlCont].DataValue.ToString());
-                        configuracion.getItemOnLine().valor = arrayEstadoControl[estadoControlCont].DataValue.ToString();
+                        updateOnline(dataValueString);
+                        configuracion.getItemOnLine().valor = dataValueString;
                         break;
                     case (int)ConfigDAO.IdItemsControl.RE + 1000:
-                        updateReadEnable(arrayEstadoControl[estadoControlCont].DataValue == null ? "BAD" : arrayEstadoControl[estadoControlCont].DataValue.ToString());
-                        configuracion.getItemReadEnable().valor = arrayEstadoControl[estadoControlCont].DataValue.ToString();
+                        updateReadEnable(dataValueString);
+                        configuracion.getItemReadEnable().valor = dataValueString;
                         break;
                 }
                 estadoControlCont++;

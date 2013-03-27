@@ -49,8 +49,8 @@ namespace PLC.DAO
                 {
                     LogOPCItem item = new LogOPCItem();
                     item.Id = (int)reader[0];
-                    item.bloque = (int)reader[1];
-                    item.nombre = (String)reader[2];
+                    item.bloque = (int)((sbyte)reader[1]);
+                    item.nombre = (String)reader[3];
 
                     items.Add(item);
                 }
@@ -75,8 +75,8 @@ namespace PLC.DAO
                 {
                     LogOPCItem item = new LogOPCItem();
                     item.Id = (int)reader[0];
-                    item.bloque = (int)reader[1];
-                    item.nombre = (String)reader[2];
+                    item.bloque = (int)((sbyte)reader[1]);
+                    item.nombre = (String)reader[3];
 
                     items.Add(item);
                 }
