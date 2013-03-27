@@ -127,6 +127,7 @@ namespace PLC
             this.OpcGroups = new OpcGroup[grupos.Count];
 
             int nroGrupo = 0;
+            OPCItemResults = new OPCItemResult[grupos.Count][];
             foreach (LogOPCGrupo grupo in grupos)
             {
                 this.OpcGroups[nroGrupo] = servidorOPC.AddGroup(grupo.nombre, true, 900);
@@ -134,15 +135,17 @@ namespace PLC
                 this.OpcGroups[nroGrupo].Active = true;
 
                 List<LogOPCItem> items = new LogOPCItemDAO(conexion.getConexion()).getItemsByGrupo(grupo);
-                OPCItemDef[] itemsOPC = new OPCItemDef[grupo.items.Count];
+                OPCItemDef[] itemsOPC = new OPCItemDef[items.Count];
 
                 int nroItem = 0;
                 foreach (LogOPCItem item in items)
                 {
                     itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
                 }
+                
+                if (items.Count > 0)
+                    this.OpcGroups[nroGrupo].AddItems(itemsOPC, out OPCItemResults[nroGrupo]);
 
-                this.OpcGroups[nroGrupo].AddItems(itemsOPC, out OPCItemResults[nroGrupo]);
                 nroGrupo++;
             }
         }       
