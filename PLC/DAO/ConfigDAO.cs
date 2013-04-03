@@ -20,7 +20,7 @@ namespace PLC
         public LogOPCItem getItemConfiguracion(IdItemsControl idItemControl, MySqlConnection conexion)
         {
             LogOPCItem item = null;
-            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_item_control WHERE id = " + (int)idItemControl, conexion);
+            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_cfg_item_control WHERE id = " + (int)idItemControl, conexion);
             MySqlDataReader reader = query.ExecuteReader();
 
             try
@@ -43,7 +43,7 @@ namespace PLC
         public LogOPCGrupo getGrupoConfiguracion()
         {
             LogOPCGrupo grupo = null;
-            MySqlCommand query = new MySqlCommand("SELECT d_grupo_opc FROM plc_item_control LIMIT 0,1", conexion);
+            MySqlCommand query = new MySqlCommand("SELECT d_grupo_opc FROM plc_cfg_item_control LIMIT 0,1", conexion);
             MySqlDataReader reader = query.ExecuteReader();
 
             try
@@ -65,7 +65,7 @@ namespace PLC
         public List<LogOPCItem> getItemsConfiguracion()
         {
             List<LogOPCItem> items = new List<LogOPCItem>();
-            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_item_control", conexion);
+            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_cfg_item_control", conexion);
             MySqlDataReader reader = query.ExecuteReader();
 
             try

@@ -14,7 +14,7 @@ namespace PLC.DAO
         public List<LogOPCGrupo> getAll()
         {
             List<LogOPCGrupo> grupos = new List<LogOPCGrupo>();
-            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_grupo", conexion);
+            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_cfg_bloque", conexion);
             MySqlDataReader reader = query.ExecuteReader();
 
             try
@@ -23,7 +23,7 @@ namespace PLC.DAO
                 {
                     LogOPCGrupo grupo = new LogOPCGrupo();
                     grupo.Id = (int)reader[0];
-                    grupo.nombre = (String)reader[1];
+                    grupo.nombre = (String)reader[2];
 
                     grupos.Add(grupo);
                 }

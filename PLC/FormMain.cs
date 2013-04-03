@@ -123,18 +123,31 @@ namespace PLC
 
         private void cargarGruposItems()
         {
-            List<LogOPCGrupo> grupos = new LogOPCGrupoDAO(conexion.getConexion()).getAll();
-            this.OpcGroups = new OpcGroup[grupos.Count];
+            List<LogOPCGrupo> bloques = new LogOPCGrupoDAO(conexion.getConexion()).getAll();
+            this.OpcGroups = new OpcGroup[bloques.Count];
 
             int nroGrupo = 0;
-            OPCItemResults = new OPCItemResult[grupos.Count][];
-            foreach (LogOPCGrupo grupo in grupos)
-            {
-                this.OpcGroups[nroGrupo] = servidorOPC.AddGroup(grupo.nombre, true, 900);
+            OPCItemResults = new OPCItemResult[bloques.Count][];
+
+            foreach (LogOPCGrupo bloque in bloques)
+            {                            
+                this.OpcGroups[nroGrupo] = servidorOPC.AddGroup(bloque.nombre, true, 900);
                 this.OpcGroups[nroGrupo].SetEnable(true);
                 this.OpcGroups[nroGrupo].Active = true;
 
-                List<LogOPCItem> items = new LogOPCItemDAO(conexion.getConexion()).getItemsByGrupo(grupo);
+                List<Etapa> etapas = new EtapaDAO(conexion.getConexion()).getAllForBloque(bloque.Id);
+                List<LogOPCItem> items = new List<LogOPCItem>();
+
+                foreach (Etapa etapa in etapas)
+                {
+                    items.Add(etapa.itemAnioFin);
+                    items.Add(etapa.itemMesFin);
+                    items.Add(etapa.itemDiaFin);
+                    items.Add(etapa.itemHoraFin);
+                    items.Add(etapa.itemMinFin);
+                    items.Add(etapa.itemSegFin);
+                }
+
                 OPCItemDef[] itemsOPC = new OPCItemDef[items.Count];
 
                 int nroItem = 0;

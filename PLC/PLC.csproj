@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conexion.cs" />
+    <Compile Include="DAO\EtapaDAO.cs" />
     <Compile Include="DAO\LogDAO.cs" />
     <Compile Include="DAO\LogHeaderDAO.cs" />
     <Compile Include="DAO\LogOPCGrupoDAO.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Config\ControlConfig.cs" />
     <Compile Include="DAO\LogRowDAO.cs" />
     <Compile Include="Domain\BussinesObject.cs" />
+    <Compile Include="Domain\Etapa.cs" />
     <Compile Include="Domain\LogOPCGrupo.cs" />
     <Compile Include="Domain\LogOPCItem.cs" />
     <Compile Include="Helper\EstadoItem.cs" />
