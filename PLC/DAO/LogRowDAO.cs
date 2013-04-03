@@ -18,6 +18,12 @@ namespace PLC.DAO
                             
                 cmd.Parameters.AddWithValue("@idProceso", idProceso);
                 cmd.Parameters.AddWithValue("@idItem", item.Id);
+
+                if (item.tipo == 1)
+                {
+                    int largo = (int)item.valor.ToCharArray()[0];
+                    item.valor = item.valor.Substring(1, largo);
+                }
                 cmd.Parameters.AddWithValue("@valor", item.valor);
 
                 cmd.ExecuteNonQuery();

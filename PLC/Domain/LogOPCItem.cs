@@ -10,6 +10,7 @@ namespace PLC.Domain
         public virtual String nombre { get; set; }
         public virtual int bloque { get; set; }
         public virtual String valor { get; set; }
+        public virtual int tipo { get; set; }
 
         public LogOPCItem() { }
 

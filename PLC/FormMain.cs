@@ -161,17 +161,17 @@ namespace PLC
             setOnline();
 
             // Si RE = 0
-            //if (configuracion.getItemReadEnable().valor == "0")
-            if(false)
-                return; // No hace nada
+            if (configuracion.getItemReadEnable().valor == "False")
+            {
+                timer.Enabled = true;
+                return;
+            }
 
             // Si RE = 1
-            //if (configuracion.getItemReadEnable().valor == "1")
-            if(true)
+            if (configuracion.getItemReadEnable().valor == "True")            
             {
                 // Consultar MP, si es diferente de 0
-                //int mp = int.Parse(configuracion.getItemMemoryPointer().valor);
-                int mp = 1;
+                int mp = int.Parse(configuracion.getItemMemoryPointer().valor);                
                 if (mp > 0 && mp <= 5)
                 {
                     List<LogOPCItem> itemsProceso = leerBloque(mp);
@@ -180,14 +180,31 @@ namespace PLC
                 }
             }
 
+            timer.Enabled = true;
         }
 
         private void setOnline()
         {
+            int[] arrHSrvControl = new int[1];            
+            arrHSrvControl[0] = OPCItemResultsControl[0].HandleServer;
+
+            object[] valor = new object[1];
+            valor[0] = true;
+
+            int[] arrayEstadoControl;
+            OpcGroupControl.SyncWrite(arrHSrvControl, valor, out arrayEstadoControl);            
         }
 
         private void decrementarMP()
         {
+            int[] arrHSrvControl = new int[1];
+            arrHSrvControl[0] = OPCItemResultsControl[2].HandleServer;
+
+            object[] valor = new object[1];
+            valor[0] = int.Parse(configuracion.getItemMemoryPointer().valor) - 1;
+
+            int[] arrayEstadoControl;
+            OpcGroupControl.SyncWrite(arrHSrvControl, valor, out arrayEstadoControl);
         }
 
         private void guardarProceso(List<LogOPCItem> items)

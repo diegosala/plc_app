@@ -14,7 +14,7 @@ namespace PLC.DAO
         public List<LogOPCItem> getItemsByGrupo(LogOPCGrupo grupo)
         {
             List<LogOPCItem> items = new List<LogOPCItem>();
-            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_item_bloque WHERE id_grupo_opc = " + grupo.Id, conexion);
+            MySqlCommand query = new MySqlCommand("SELECT ib.*, itp.id_tipo_dato FROM plc_item_bloque ib JOIN plc_item_tipo_proceso itp ON ib.id_item_tipo_proceso = itp.id WHERE id_grupo_opc = " + grupo.Id, conexion);
             MySqlDataReader reader = query.ExecuteReader();
 
             try
@@ -25,6 +25,7 @@ namespace PLC.DAO
                     item.Id = (int)reader[0];
                     item.bloque = (int)((sbyte)reader[1]);
                     item.nombre = (String)reader[3];
+                    item.tipo = (int)reader[5];
 
                     items.Add(item);
                 }
@@ -40,7 +41,7 @@ namespace PLC.DAO
         public List<LogOPCItem> getItemsByBloque(int idBloque)
         {
             List<LogOPCItem> items = new List<LogOPCItem>();
-            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_item_bloque WHERE n_bloque = " + idBloque.ToString(), conexion);
+            MySqlCommand query = new MySqlCommand("SELECT ib.*, itp.id_tipo_dato FROM plc_item_bloque ib JOIN plc_item_tipo_proceso itp ON ib.id_item_tipo_proceso = itp.id WHERE n_bloque = " + idBloque.ToString(), conexion);
             MySqlDataReader reader = query.ExecuteReader();
 
             try
@@ -51,6 +52,7 @@ namespace PLC.DAO
                     item.Id = (int)reader[0];
                     item.bloque = (int)((sbyte)reader[1]);
                     item.nombre = (String)reader[3];
+                    item.tipo = (int)reader[5];
 
                     items.Add(item);
                 }
