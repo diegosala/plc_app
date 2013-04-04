@@ -124,8 +124,9 @@ namespace PLC
         private void cargarGruposItems()
         {
             List<LogOPCItem> itemsCabecera;
+            List<LogOPCItem> itemsInicio;
             List<LogOPCItem> itemsEtapas;
-            List<LogOPCItem> itemsVelocidad;
+            List<LogOPCItem> itemsVelocidad;            
 
             List<LogOPCGrupo> bloques = new LogOPCGrupoDAO(conexion.getConexion()).getAll();
             this.OpcGroups = new OpcGroup[bloques.Count];
@@ -142,6 +143,17 @@ namespace PLC
 
                 // Cargo items para la cabecera
                 itemsCabecera = new ConfigDAO(conexion.getConexion()).getItemsCabeceraForBloque(bloque.Id);
+
+                // Cargo items para el inicio
+                Inicio inicio = new ConfigDAO(conexion.getConexion()).getInicioForBloque(bloque.Id);
+                
+                itemsInicio = new List<LogOPCItem>();
+                itemsInicio.Add(inicio.itemAnioInicio);
+                itemsInicio.Add(inicio.itemMesInicio);
+                itemsInicio.Add(inicio.itemDiaInicio);
+                itemsInicio.Add(inicio.itemHoraInicio);
+                itemsInicio.Add(inicio.itemMinInicio);
+                itemsInicio.Add(inicio.itemSegInicio);
 
                 // Cargo items para las etapas
                 List<Etapa> etapas = new ConfigDAO(conexion.getConexion()).getAllEtapasForBloque(bloque.Id);
@@ -167,11 +179,14 @@ namespace PLC
                 }
 
                 // Genero arreglo de items OPC y agrego los items de cabecera y etapas
-                OPCItemDef[] itemsOPC = new OPCItemDef[itemsCabecera.Count + itemsEtapas.Count +  itemsVelocidad.Count];
+                OPCItemDef[] itemsOPC = new OPCItemDef[itemsCabecera.Count + itemsInicio.Count + itemsEtapas.Count +  itemsVelocidad.Count];
 
                 int nroItem = 0;
                 foreach (LogOPCItem item in itemsCabecera)
                     itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
+
+                foreach (LogOPCItem item in itemsInicio)
+                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + 500, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
 
                 foreach (LogOPCItem item in itemsEtapas)                
                     itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + 1000, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
@@ -180,7 +195,7 @@ namespace PLC
                     itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + 2000, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
                 
                 // Agrego los items OPC al grupo OPC
-                if ((itemsCabecera.Count > 0) || (itemsEtapas.Count > 0) || (itemsVelocidad.Count > 0))
+                if ((itemsCabecera.Count > 0) || (itemsInicio.Count > 0) || (itemsEtapas.Count > 0) || (itemsVelocidad.Count > 0))
                     this.OpcGroups[nroGrupo].AddItems(itemsOPC, out OPCItemResults[nroGrupo]);
 
                 nroGrupo++;
@@ -214,8 +229,8 @@ namespace PLC
                 if (mp > 0 && mp <= 5)
                 {
                     Proceso proceso = leerBloque(mp);
-                    //guardarProceso(itemsProceso);
-                    decrementarMP();
+                    if (new ProcesoDAO(conexion.getConexion()).save(proceso))
+                        decrementarMP();
                 }
             }
 
@@ -281,10 +296,12 @@ namespace PLC
 
             // Cargo los valores en el proceso            
             List<LogOPCItem> cabecera = new ConfigDAO(conexion.getConexion()).getItemsCabeceraForBloque(nBloque);
+            Inicio inicio = new ConfigDAO(conexion.getConexion()).getInicioForBloque(nBloque);
             List<Etapa> etapas = new ConfigDAO(conexion.getConexion()).getAllEtapasForBloque(nBloque);
             List<Velocidad> velocidades = new ConfigDAO(conexion.getConexion()).getAllVelocidadesForBloque(nBloque);
 
-            for (int i = 1; i < 3; i++)
+            // Cargo cabecera
+            for (int i = 1; i <= 3; i++)
             {
                 String v = valoresItems[i];
                 switch (i)
@@ -302,6 +319,14 @@ namespace PLC
 
             }
 
+            inicio.itemAnioInicio.valor = valoresItems[inicio.itemAnioInicio.Id + 500];
+            inicio.itemMesInicio.valor = valoresItems[inicio.itemMesInicio.Id + 500];
+            inicio.itemDiaInicio.valor = valoresItems[inicio.itemDiaInicio.Id + 500];
+            inicio.itemHoraInicio.valor = valoresItems[inicio.itemHoraInicio.Id + 500];
+            inicio.itemMinInicio.valor = valoresItems[inicio.itemMinInicio.Id + 500];
+            inicio.itemSegInicio.valor = valoresItems[inicio.itemSegInicio.Id + 500];
+
+            // Cargo etapas
             foreach (Etapa etapa in etapas)
             {
                 etapa.itemAnioFin.valor = valoresItems[etapa.itemAnioFin.Id + 1000];
@@ -312,12 +337,14 @@ namespace PLC
                 etapa.itemSegFin.valor = valoresItems[etapa.itemSegFin.Id + 1000];
             }
 
+            // Cargo velocidades
             foreach (Velocidad velocidad in velocidades)
             {
                 velocidad.item.valor = valoresItems[velocidad.item.Id + 2000];
             }
             
             p.etapas = etapas;
+            p.inicio = inicio;
             p.velocidades = velocidades;
 
             return p;

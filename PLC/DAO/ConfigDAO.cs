@@ -114,6 +114,33 @@ namespace PLC
             return items;
         }
 
+        public Inicio getInicioForBloque(int idBloque)
+        {
+            Inicio inicio = new Inicio();
+            inicio.idBloque = idBloque;
+
+            MySqlCommand query = new MySqlCommand("SELECT * FROM v_cfg_inicioxbloque WHERE id_bloque = " + inicio.idBloque, conexion);
+            MySqlDataReader reader = query.ExecuteReader();
+
+            try
+            {
+                while (reader.Read())
+                {
+                    inicio.itemAnioInicio = new LogOPCItem((int)reader[1], inicio.idBloque, (string)reader[2]);
+                    inicio.itemMesInicio = new LogOPCItem((int)reader[3], inicio.idBloque, (string)reader[4]);
+                    inicio.itemDiaInicio = new LogOPCItem((int)reader[5], inicio.idBloque, (string)reader[6]);
+                    inicio.itemHoraInicio = new LogOPCItem((int)reader[7], inicio.idBloque, (string)reader[8]);
+                    inicio.itemMinInicio = new LogOPCItem((int)reader[9], inicio.idBloque, (string)reader[10]);
+                    inicio.itemSegInicio = new LogOPCItem((int)reader[11], inicio.idBloque, (string)reader[12]);
+                }
+            }
+            finally
+            {
+                reader.Close();
+            }
+            return inicio;
+        }
+
         public List<Etapa> getAllEtapasForBloque(int idBloque)
         {
             List<Etapa> etapas = new List<Etapa>();
@@ -165,6 +192,7 @@ namespace PLC
                 reader.Close();
             }
         }
+        
 
         public List<Velocidad> getAllVelocidadesForBloque(int idBloque)
         {

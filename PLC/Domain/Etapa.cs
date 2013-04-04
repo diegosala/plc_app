@@ -36,5 +36,31 @@ namespace PLC.Domain
             listaItems.Add(itemMinFin);
             listaItems.Add(itemSegFin);
         }
+
+        public Boolean isValid()
+        {
+            return itemAnioFin.valor != "1970";
+        }
+
+        public DateTime generarFechaFin()
+        {
+            int anio, mes, dia, hora, minuto, segundo;
+
+            try
+            {
+                anio = int.Parse(itemAnioFin.valor);
+                mes = int.Parse(itemMesFin.valor);
+                dia = int.Parse(itemDiaFin.valor);
+                hora = int.Parse(itemHoraFin.valor);
+                minuto = int.Parse(itemMinFin.valor);
+                segundo = int.Parse(itemSegFin.valor);
+            }
+            catch (Exception e)
+            {
+                return new DateTime();
+            }
+
+            return new DateTime(anio, mes, dia, hora, minuto, segundo);
+        }
     }
 }
