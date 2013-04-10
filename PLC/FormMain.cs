@@ -260,12 +260,7 @@ namespace PLC
             int[] arrayEstadoControl;
             OpcGroupControl.SyncWrite(arrHSrvControl, valor, out arrayEstadoControl);
         }
-
-        private void guardarProceso(List<int> items)
-        {
-            //int idProceso = new LogHeaderDAO(conexion.getConexion()).saveLogHeader();
-            //new LogRowDAO(conexion.getConexion()).guradarProceso(idProceso, items);
-        }
+        
 
         private Proceso leerBloque(int idBloque)
         {
