@@ -18,5 +18,12 @@ namespace PLC.Domain
         {
             this.Id = id;
         }
+
+        public LogOPCItem(Int32 id, int bloque, String nombre)
+        {
+            this.Id = id;
+            this.bloque = bloque;
+            this.nombre = nombre;
+        }
     }
 }

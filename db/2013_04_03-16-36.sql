@@ -3,7 +3,7 @@
 -- Server version:               5.5.24-log - MySQL Community Server (GPL)
 -- Server OS:                    Win32
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2013-04-18 20:10:59
+-- Date/time:                    2013-04-03 16:36:27
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -167,44 +167,6 @@ INSERT INTO `plc_cfg_finxetapaxbloque` (`id`, `id_etapa`, `id_bloque`, `id_item_
 	(29, 5, 5, 169, 170, 171, 172, 173, 174),
 	(30, 6, 5, 175, 176, 177, 178, 179, 180);
 /*!40000 ALTER TABLE `plc_cfg_finxetapaxbloque` ENABLE KEYS */;
-
-
--- Dumping structure for table plc.plc_cfg_inicioxbloque
-CREATE TABLE IF NOT EXISTS `plc_cfg_inicioxbloque` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `id_bloque` int(10) NOT NULL,
-  `id_item_anio` int(10) NOT NULL,
-  `id_item_mes` int(10) NOT NULL,
-  `id_item_dia` int(10) NOT NULL,
-  `id_item_hora` int(10) NOT NULL,
-  `id_item_minuto` int(10) NOT NULL,
-  `id_item_segundo` int(10) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_inixblo_bloque` (`id_bloque`),
-  KEY `fk_inixblo_anio` (`id_item_anio`),
-  KEY `fk_inixblo_mes` (`id_item_mes`),
-  KEY `fk_inixblo_dia` (`id_item_dia`),
-  KEY `fk_inixblo_hora` (`id_item_hora`),
-  KEY `fk_inixblo_minuto` (`id_item_minuto`),
-  KEY `fk_inixblo_segundo` (`id_item_segundo`),
-  CONSTRAINT `fk_inixblo_anio` FOREIGN KEY (`id_item_anio`) REFERENCES `plc_cfg_item_inicio` (`id`),
-  CONSTRAINT `fk_inixblo_bloque` FOREIGN KEY (`id_bloque`) REFERENCES `plc_cfg_bloque` (`id`),
-  CONSTRAINT `fk_inixblo_dia` FOREIGN KEY (`id_item_dia`) REFERENCES `plc_cfg_item_inicio` (`id`),
-  CONSTRAINT `fk_inixblo_hora` FOREIGN KEY (`id_item_hora`) REFERENCES `plc_cfg_item_inicio` (`id`),
-  CONSTRAINT `fk_inixblo_mes` FOREIGN KEY (`id_item_mes`) REFERENCES `plc_cfg_item_inicio` (`id`),
-  CONSTRAINT `fk_inixblo_minuto` FOREIGN KEY (`id_item_minuto`) REFERENCES `plc_cfg_item_inicio` (`id`),
-  CONSTRAINT `fk_inixblo_segundo` FOREIGN KEY (`id_item_segundo`) REFERENCES `plc_cfg_item_inicio` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
-
--- Dumping data for table plc.plc_cfg_inicioxbloque: ~5 rows (approximately)
-/*!40000 ALTER TABLE `plc_cfg_inicioxbloque` DISABLE KEYS */;
-INSERT INTO `plc_cfg_inicioxbloque` (`id`, `id_bloque`, `id_item_anio`, `id_item_mes`, `id_item_dia`, `id_item_hora`, `id_item_minuto`, `id_item_segundo`) VALUES
-	(1, 1, 1, 2, 3, 4, 5, 6),
-	(2, 2, 7, 8, 9, 10, 11, 12),
-	(3, 3, 13, 14, 15, 16, 17, 18),
-	(4, 4, 19, 20, 21, 22, 23, 24),
-	(5, 5, 25, 26, 27, 28, 29, 30);
-/*!40000 ALTER TABLE `plc_cfg_inicioxbloque` ENABLE KEYS */;
 
 
 -- Dumping structure for table plc.plc_cfg_item_control
@@ -417,61 +379,15 @@ INSERT INTO `plc_cfg_item_fin` (`id`, `d_item`) VALUES
 /*!40000 ALTER TABLE `plc_cfg_item_fin` ENABLE KEYS */;
 
 
--- Dumping structure for table plc.plc_cfg_item_inicio
-CREATE TABLE IF NOT EXISTS `plc_cfg_item_inicio` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `d_item` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
-
--- Dumping data for table plc.plc_cfg_item_inicio: ~30 rows (approximately)
-/*!40000 ALTER TABLE `plc_cfg_item_inicio` DISABLE KEYS */;
-INSERT INTO `plc_cfg_item_inicio` (`id`, `d_item`) VALUES
-	(1, 'MicroWin.1200.Bloque1.OF_HORA_IN - AÑO'),
-	(2, 'MicroWin.1200.Bloque1.OF_HORA_IN - MES'),
-	(3, 'MicroWin.1200.Bloque1.OF_HORA_IN - DIA'),
-	(4, 'MicroWin.1200.Bloque1.OF_HORA_IN - HORA'),
-	(5, 'MicroWin.1200.Bloque1.OF_HORA_IN - MIN'),
-	(6, 'MicroWin.1200.Bloque1.OF_HORA_IN - SEG'),
-	(7, 'MicroWin.1200.Bloque2.OF_HORA_IN - AÑO'),
-	(8, 'MicroWin.1200.Bloque2.OF_HORA_IN - MES'),
-	(9, 'MicroWin.1200.Bloque2.OF_HORA_IN - DIA'),
-	(10, 'MicroWin.1200.Bloque2.OF_HORA_IN - HORA'),
-	(11, 'MicroWin.1200.Bloque2.OF_HORA_IN - MIN'),
-	(12, 'MicroWin.1200.Bloque2.OF_HORA_IN - SEG'),
-	(13, 'MicroWin.1200.Bloque3.OF_HORA_IN - AÑO'),
-	(14, 'MicroWin.1200.Bloque3.OF_HORA_IN - MES'),
-	(15, 'MicroWin.1200.Bloque3.OF_HORA_IN - DIA'),
-	(16, 'MicroWin.1200.Bloque3.OF_HORA_IN - HORA'),
-	(17, 'MicroWin.1200.Bloque3.OF_HORA_IN - MIN'),
-	(18, 'MicroWin.1200.Bloque3.OF_HORA_IN - SEG'),
-	(19, 'MicroWin.1200.Bloque4.OF_HORA_IN - AÑO'),
-	(20, 'MicroWin.1200.Bloque4.OF_HORA_IN - MES'),
-	(21, 'MicroWin.1200.Bloque4.OF_HORA_IN - DIA'),
-	(22, 'MicroWin.1200.Bloque4.OF_HORA_IN - HORA'),
-	(23, 'MicroWin.1200.Bloque4.OF_HORA_IN - MIN'),
-	(24, 'MicroWin.1200.Bloque4.OF_HORA_IN - SEG'),
-	(25, 'MicroWin.1200.Bloque5.OF_HORA_IN - AÑO'),
-	(26, 'MicroWin.1200.Bloque5.OF_HORA_IN - MES'),
-	(27, 'MicroWin.1200.Bloque5.OF_HORA_IN - DIA'),
-	(28, 'MicroWin.1200.Bloque5.OF_HORA_IN - HORA'),
-	(29, 'MicroWin.1200.Bloque5.OF_HORA_IN - MIN'),
-	(30, 'MicroWin.1200.Bloque5.OF_HORA_IN - SEG');
-/*!40000 ALTER TABLE `plc_cfg_item_inicio` ENABLE KEYS */;
-
-
 -- Dumping structure for table plc.plc_cfg_velocidad
 CREATE TABLE IF NOT EXISTS `plc_cfg_velocidad` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `d_velocidad` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table plc.plc_cfg_velocidad: ~2 rows (approximately)
+-- Dumping data for table plc.plc_cfg_velocidad: ~0 rows (approximately)
 /*!40000 ALTER TABLE `plc_cfg_velocidad` DISABLE KEYS */;
-INSERT INTO `plc_cfg_velocidad` (`id`, `d_velocidad`) VALUES
-	(1, 'Velocidad Mezclado Lento'),
-	(2, 'Velocidad Mezclado Rapido');
 /*!40000 ALTER TABLE `plc_cfg_velocidad` ENABLE KEYS */;
 
 
@@ -484,52 +400,27 @@ CREATE TABLE IF NOT EXISTS `plc_cfg_velocidadxbloque` (
   PRIMARY KEY (`id`),
   KEY `fk_vxb_velocidad` (`id_velocidad`),
   KEY `fk_vxb_bloque` (`id_bloque`),
-  CONSTRAINT `fk_vxb_bloque` FOREIGN KEY (`id_bloque`) REFERENCES `plc_cfg_bloque` (`id`),
-  CONSTRAINT `fk_vxb_velocidad` FOREIGN KEY (`id_velocidad`) REFERENCES `plc_cfg_velocidad` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+  CONSTRAINT `fk_vxb_velocidad` FOREIGN KEY (`id_velocidad`) REFERENCES `plc_cfg_velocidad` (`id`),
+  CONSTRAINT `fk_vxb_bloque` FOREIGN KEY (`id_bloque`) REFERENCES `plc_cfg_bloque` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table plc.plc_cfg_velocidadxbloque: ~2 rows (approximately)
+-- Dumping data for table plc.plc_cfg_velocidadxbloque: ~0 rows (approximately)
 /*!40000 ALTER TABLE `plc_cfg_velocidadxbloque` DISABLE KEYS */;
-INSERT INTO `plc_cfg_velocidadxbloque` (`id`, `id_velocidad`, `id_bloque`, `d_item`) VALUES
-	(1, 1, 1, 'MicroWin.1200.Bloque1.RPM_V1'),
-	(2, 2, 1, 'MicroWin.1200.Bloque1.RPM_V2'),
-	(3, 1, 2, 'MicroWin.1200.Bloque2.RPM_V1'),
-	(4, 2, 2, 'MicroWin.1200.Bloque2.RPM_V2'),
-	(5, 1, 3, 'MicroWin.1200.Bloque3.RPM_V1'),
-	(6, 2, 3, 'MicroWin.1200.Bloque3.RPM_V2'),
-	(7, 1, 4, 'MicroWin.1200.Bloque4.RPM_V1'),
-	(8, 2, 4, 'MicroWin.1200.Bloque4.RPM_V2'),
-	(9, 1, 5, 'MicroWin.1200.Bloque5.RPM_V1'),
-	(10, 2, 5, 'MicroWin.1200.Bloque5.RPM_V2');
 /*!40000 ALTER TABLE `plc_cfg_velocidadxbloque` ENABLE KEYS */;
 
 
 -- Dumping structure for table plc.plc_log_proceso
 CREATE TABLE IF NOT EXISTS `plc_log_proceso` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
-  `d_producto` varchar(50) DEFAULT NULL,
-  `d_lote` varchar(50) DEFAULT NULL,
-  `d_operario` varchar(50) DEFAULT NULL,
-  `f_inicio` datetime DEFAULT NULL,
+  `d_producto` varchar(50) NOT NULL,
+  `d_lote` varchar(50) NOT NULL,
+  `d_operario` varchar(50) NOT NULL,
+  `f_inicio` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table plc.plc_log_proceso: ~12 rows (approximately)
+-- Dumping data for table plc.plc_log_proceso: ~0 rows (approximately)
 /*!40000 ALTER TABLE `plc_log_proceso` DISABLE KEYS */;
-INSERT INTO `plc_log_proceso` (`id`, `d_producto`, `d_lote`, `d_operario`, `f_inicio`) VALUES
-	(2, 'Producto 1', 'Lote 1', 'Chuche', '2013-04-04 16:25:00'),
-	(3, 'Producto 2', 'Lote 2', 'Pablo', '2012-04-04 16:30:50'),
-	(4, 'Producto 3', 'Lote 3', 'Diego', '2013-04-04 16:32:50'),
-	(5, 'Producto 4', NULL, NULL, NULL),
-	(6, 'Producto 5', NULL, NULL, NULL),
-	(7, 'Producto 6', NULL, NULL, NULL),
-	(8, 'Producto 7', NULL, NULL, NULL),
-	(9, 'Producto 8', NULL, NULL, NULL),
-	(10, 'Producto 9', NULL, NULL, NULL),
-	(11, 'Producto 10', NULL, NULL, NULL),
-	(12, 'Producto 11', NULL, NULL, NULL),
-	(19, 'Producto 1', 'N° Lote 1', 'Juan', '2013-04-18 19:31:51'),
-	(21, 'Producto 2', 'LOT2', 'Supervisor', '2013-04-18 19:44:26');
 /*!40000 ALTER TABLE `plc_log_proceso` ENABLE KEYS */;
 
 
@@ -542,50 +433,27 @@ CREATE TABLE IF NOT EXISTS `plc_log_proceso_etapa` (
   PRIMARY KEY (`id`),
   KEY `fk_proceso_e_proceso` (`id_proceso`),
   KEY `fk_proceso_e_etapa` (`id_etapa`),
-  CONSTRAINT `fk_proceso_e_etapa` FOREIGN KEY (`id_etapa`) REFERENCES `plc_cfg_etapa` (`id`),
-  CONSTRAINT `fk_proceso_e_proceso` FOREIGN KEY (`id_proceso`) REFERENCES `plc_log_proceso` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=latin1;
+  CONSTRAINT `fk_proceso_e_proceso` FOREIGN KEY (`id_proceso`) REFERENCES `plc_log_proceso` (`id`),
+  CONSTRAINT `fk_proceso_e_etapa` FOREIGN KEY (`id_etapa`) REFERENCES `plc_cfg_etapa` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table plc.plc_log_proceso_etapa: ~10 rows (approximately)
+-- Dumping data for table plc.plc_log_proceso_etapa: ~0 rows (approximately)
 /*!40000 ALTER TABLE `plc_log_proceso_etapa` DISABLE KEYS */;
-INSERT INTO `plc_log_proceso_etapa` (`id`, `id_proceso`, `id_etapa`, `f_fin`) VALUES
-	(7, 2, 1, '2013-04-04 16:32:12'),
-	(8, 2, 5, '2013-04-04 16:31:28'),
-	(9, 2, 4, '2013-04-04 16:32:42'),
-	(10, 3, 1, '2013-04-04 16:32:58'),
-	(11, 19, 1, '2013-04-18 19:31:57'),
-	(12, 19, 2, '2013-04-18 19:32:17'),
-	(13, 19, 3, '2013-04-18 19:32:07'),
-	(14, 19, 4, '2013-04-18 19:32:22'),
-	(15, 19, 5, '2013-04-18 19:32:02'),
-	(16, 19, 6, '2013-04-18 19:32:12'),
-	(23, 21, 1, '2013-04-18 19:44:36'),
-	(24, 21, 2, '2013-04-18 19:45:16'),
-	(25, 21, 3, '2013-04-18 19:44:56'),
-	(26, 21, 4, '2013-04-18 19:45:26'),
-	(27, 21, 5, '2013-04-18 19:44:46'),
-	(28, 21, 6, '2013-04-18 19:45:06');
 /*!40000 ALTER TABLE `plc_log_proceso_etapa` ENABLE KEYS */;
 
 
 -- Dumping structure for table plc.plc_log_proceso_velocidad
 CREATE TABLE IF NOT EXISTS `plc_log_proceso_velocidad` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
-  `id_proceso` int(10) NOT NULL,
   `id_velocidad` int(10) NOT NULL,
   `n_velocidad` int(10) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_log_v_velocidad` (`id_velocidad`),
-  KEY `fk_log_v_proceso` (`id_proceso`),
-  CONSTRAINT `fk_log_v_proceso` FOREIGN KEY (`id_proceso`) REFERENCES `plc_log_proceso` (`id`),
   CONSTRAINT `fk_log_v_velocidad` FOREIGN KEY (`id_velocidad`) REFERENCES `plc_cfg_velocidad` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Dumping data for table plc.plc_log_proceso_velocidad: ~0 rows (approximately)
 /*!40000 ALTER TABLE `plc_log_proceso_velocidad` DISABLE KEYS */;
-INSERT INTO `plc_log_proceso_velocidad` (`id`, `id_proceso`, `id_velocidad`, `n_velocidad`) VALUES
-	(1, 21, 1, 1500),
-	(2, 21, 2, 3000);
 /*!40000 ALTER TABLE `plc_log_proceso_velocidad` ENABLE KEYS */;
 
 
@@ -593,25 +461,6 @@ INSERT INTO `plc_log_proceso_velocidad` (`id`, `id_proceso`, `id_velocidad`, `n_
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_cfg_finxetapaxbloque` (
 	`id_etapa` INT(10) NOT NULL,
-	`id_bloque` INT(10) NOT NULL,
-	`id_item_anio` INT(10) NOT NULL DEFAULT '0',
-	`d_item_anio` VARCHAR(50) NOT NULL COLLATE 'latin1_swedish_ci',
-	`id_item_mes` INT(10) NOT NULL DEFAULT '0',
-	`d_item_mes` VARCHAR(50) NOT NULL COLLATE 'latin1_swedish_ci',
-	`id_item_dia` INT(10) NOT NULL DEFAULT '0',
-	`d_item_dia` VARCHAR(50) NOT NULL COLLATE 'latin1_swedish_ci',
-	`id_item_hora` INT(10) NOT NULL DEFAULT '0',
-	`d_item_hora` VARCHAR(50) NOT NULL COLLATE 'latin1_swedish_ci',
-	`id_item_minuto` INT(10) NOT NULL DEFAULT '0',
-	`d_item_minuto` VARCHAR(50) NOT NULL COLLATE 'latin1_swedish_ci',
-	`id_item_segundo` INT(10) NOT NULL DEFAULT '0',
-	`d_item_segundo` VARCHAR(50) NOT NULL COLLATE 'latin1_swedish_ci'
-) ENGINE=MyISAM;
-
-
--- Dumping structure for view plc.v_cfg_inicioxbloque
--- Creating temporary table to overcome VIEW dependency errors
-CREATE TABLE `v_cfg_inicioxbloque` (
 	`id_bloque` INT(10) NOT NULL,
 	`id_item_anio` INT(10) NOT NULL DEFAULT '0',
 	`d_item_anio` VARCHAR(50) NOT NULL COLLATE 'latin1_swedish_ci',
@@ -646,24 +495,5 @@ JOIN plc_cfg_item_fin dia ON fxexb.id_item_dia_fin = dia.id
 JOIN plc_cfg_item_fin hora ON fxexb.id_item_hora_fin = hora.id
 JOIN plc_cfg_item_fin minuto ON fxexb.id_item_min_fin = minuto.id
 JOIN plc_cfg_item_fin seg ON fxexb.id_item_seg_fin = seg.id ;
-
-
--- Dumping structure for view plc.v_cfg_inicioxbloque
--- Removing temporary table and create final VIEW structure
-DROP TABLE IF EXISTS `v_cfg_inicioxbloque`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` VIEW `v_cfg_inicioxbloque` AS SELECT 	ixb.id_bloque, 
-			anio.id id_item_anio, anio.d_item d_item_anio,
-			mes.id id_item_mes, mes.d_item d_item_mes,
-			dia.id id_item_dia, dia.d_item d_item_dia,
-			hora.id id_item_hora, hora.d_item d_item_hora,
-			minuto.id id_item_minuto, minuto.d_item d_item_minuto,
-			seg.id id_item_segundo, seg.d_item d_item_segundo															
-FROM plc_cfg_inicioxbloque ixb
-JOIN plc_cfg_item_inicio anio ON ixb.id_item_anio = anio.id
-JOIN plc_cfg_item_inicio mes ON ixb.id_item_mes = mes.id
-JOIN plc_cfg_item_inicio dia ON ixb.id_item_dia = dia.id
-JOIN plc_cfg_item_inicio hora ON ixb.id_item_hora = hora.id
-JOIN plc_cfg_item_inicio minuto ON ixb.id_item_minuto = minuto.id
-JOIN plc_cfg_item_inicio seg ON ixb.id_item_segundo = seg.id ;
 /*!40014 SET FOREIGN_KEY_CHECKS=1 */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

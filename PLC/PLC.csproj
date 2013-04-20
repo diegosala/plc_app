@@ -52,15 +52,18 @@
   <ItemGroup>
     <Compile Include="Conexion.cs" />
     <Compile Include="DAO\LogDAO.cs" />
-    <Compile Include="DAO\LogHeaderDAO.cs" />
     <Compile Include="DAO\LogOPCGrupoDAO.cs" />
     <Compile Include="DAO\LogOPCItemDAO.cs" />
     <Compile Include="DAO\ConfigDAO.cs" />
     <Compile Include="Config\ControlConfig.cs" />
-    <Compile Include="DAO\LogRowDAO.cs" />
+    <Compile Include="DAO\ProcesoDAO.cs" />
     <Compile Include="Domain\BussinesObject.cs" />
+    <Compile Include="Domain\Etapa.cs" />
+    <Compile Include="Domain\Inicio.cs" />
     <Compile Include="Domain\LogOPCGrupo.cs" />
     <Compile Include="Domain\LogOPCItem.cs" />
+    <Compile Include="Domain\Proceso.cs" />
+    <Compile Include="Domain\Velocidad.cs" />
     <Compile Include="Helper\EstadoItem.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>

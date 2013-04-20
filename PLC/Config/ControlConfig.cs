@@ -8,8 +8,7 @@ using PLC.Domain;
 namespace PLC.Config
 {    
     class ControlConfig
-    {
-        private HashSet<LogOPCItem> items;
+    {        
         private IDictionary<Int32, LogOPCGrupo> grupos;
 
         public LogOPCItem itemOnline;
