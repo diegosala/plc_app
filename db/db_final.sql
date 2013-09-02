@@ -3,7 +3,7 @@
 -- Server version:               5.5.24-log - MySQL Community Server (GPL)
 -- Server OS:                    Win32
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2013-04-18 20:10:59
+-- Date/time:                    2013-08-07 22:23:18
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -84,6 +84,44 @@ INSERT INTO `plc_cfg_cabeceraxbloque` (`id`, `id_bloque`, `id_cabecera`, `d_item
 /*!40000 ALTER TABLE `plc_cfg_cabeceraxbloque` ENABLE KEYS */;
 
 
+-- Dumping structure for table plc.plc_cfg_estado
+CREATE TABLE IF NOT EXISTS `plc_cfg_estado` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `d_estado` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+
+-- Dumping data for table plc.plc_cfg_estado: ~4 rows (approximately)
+/*!40000 ALTER TABLE `plc_cfg_estado` DISABLE KEYS */;
+INSERT INTO `plc_cfg_estado` (`id`, `d_estado`) VALUES
+	(1, 'Proceso finalizado correctamente'),
+	(2, 'Proceso cancelado: parada de emergencia activada'),
+	(3, 'Proceso cancelado: apertura de bowl'),
+	(4, 'Proceso cancelado: error de motor');
+/*!40000 ALTER TABLE `plc_cfg_estado` ENABLE KEYS */;
+
+
+-- Dumping structure for table plc.plc_cfg_estadoxbloque
+CREATE TABLE IF NOT EXISTS `plc_cfg_estadoxbloque` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `id_bloque` int(10) NOT NULL,
+  `d_item` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_estadoxbloque_bloque` (`id_bloque`),
+  CONSTRAINT `fk_estadoxbloque_bloque` FOREIGN KEY (`id_bloque`) REFERENCES `plc_cfg_bloque` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+
+-- Dumping data for table plc.plc_cfg_estadoxbloque: ~5 rows (approximately)
+/*!40000 ALTER TABLE `plc_cfg_estadoxbloque` DISABLE KEYS */;
+INSERT INTO `plc_cfg_estadoxbloque` (`id`, `id_bloque`, `d_item`) VALUES
+	(1, 1, 'MicroWin.1200.Bloque1.ESTADO_PROCESO_1'),
+	(2, 2, 'MicroWin.1200.Bloque2.ESTADO_PROCESO_2'),
+	(3, 3, 'MicroWin.1200.Bloque3.ESTADO_PROCESO_3'),
+	(4, 4, 'MicroWin.1200.Bloque4.ESTADO_PROCESO_4'),
+	(5, 5, 'MicroWin.1200.Bloque5.ESTADO_PROCESO_5');
+/*!40000 ALTER TABLE `plc_cfg_estadoxbloque` ENABLE KEYS */;
+
+
 -- Dumping structure for table plc.plc_cfg_etapa
 CREATE TABLE IF NOT EXISTS `plc_cfg_etapa` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
@@ -98,8 +136,8 @@ INSERT INTO `plc_cfg_etapa` (`id`, `d_etapa`) VALUES
 	(2, 'Mezclado Velocidad 2'),
 	(3, 'Chopper Velocidad 1'),
 	(4, 'Chopper Velocidad 2'),
-	(5, 'Disolvente Velocidad 1'),
-	(6, 'Disolvente Velocidad 2');
+	(5, 'Ingreso Disolvente 1'),
+	(6, 'Ingreso Disolvente 2');
 /*!40000 ALTER TABLE `plc_cfg_etapa` ENABLE KEYS */;
 
 
@@ -488,7 +526,7 @@ CREATE TABLE IF NOT EXISTS `plc_cfg_velocidadxbloque` (
   CONSTRAINT `fk_vxb_velocidad` FOREIGN KEY (`id_velocidad`) REFERENCES `plc_cfg_velocidad` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
--- Dumping data for table plc.plc_cfg_velocidadxbloque: ~2 rows (approximately)
+-- Dumping data for table plc.plc_cfg_velocidadxbloque: ~10 rows (approximately)
 /*!40000 ALTER TABLE `plc_cfg_velocidadxbloque` DISABLE KEYS */;
 INSERT INTO `plc_cfg_velocidadxbloque` (`id`, `id_velocidad`, `id_bloque`, `d_item`) VALUES
 	(1, 1, 1, 'MicroWin.1200.Bloque1.RPM_V1'),
@@ -512,9 +550,9 @@ CREATE TABLE IF NOT EXISTS `plc_log_proceso` (
   `d_operario` varchar(50) DEFAULT NULL,
   `f_inicio` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=latin1;
 
--- Dumping data for table plc.plc_log_proceso: ~12 rows (approximately)
+-- Dumping data for table plc.plc_log_proceso: ~23 rows (approximately)
 /*!40000 ALTER TABLE `plc_log_proceso` DISABLE KEYS */;
 INSERT INTO `plc_log_proceso` (`id`, `d_producto`, `d_lote`, `d_operario`, `f_inicio`) VALUES
 	(2, 'Producto 1', 'Lote 1', 'Chuche', '2013-04-04 16:25:00'),
@@ -529,8 +567,44 @@ INSERT INTO `plc_log_proceso` (`id`, `d_producto`, `d_lote`, `d_operario`, `f_in
 	(11, 'Producto 10', NULL, NULL, NULL),
 	(12, 'Producto 11', NULL, NULL, NULL),
 	(19, 'Producto 1', 'N° Lote 1', 'Juan', '2013-04-18 19:31:51'),
-	(21, 'Producto 2', 'LOT2', 'Supervisor', '2013-04-18 19:44:26');
+	(21, 'Producto 2', 'LOT2', 'Supervisor', '2013-04-18 19:44:26'),
+	(22, 'Producto 1', 'N° Lote', 'S', '2013-07-06 08:18:56'),
+	(23, 'Producto 1', 'N° Lote', 'S', '2013-07-06 09:10:18'),
+	(24, 'Producto 1', 'N° Lote', 'S', '2013-07-06 09:10:18'),
+	(25, 'Producto 1', 'EST01', 'S', '2013-07-06 09:17:34'),
+	(26, 'Producto 1', 'EST02', 'S', '2013-07-06 09:21:43'),
+	(27, 'Producto 1', 'EST02', 'S', '2013-07-06 09:38:27'),
+	(28, 'Producto 1', 'EST02', 'S', '2013-07-06 09:40:02'),
+	(29, 'Producto 1', 'LALA', 'S', '2013-07-06 09:41:08'),
+	(30, 'Producto 2', 'RED', 'S', '2013-07-06 10:09:49'),
+	(31, 'Producto 2', 'RED', 'S', '2013-07-06 10:11:42');
 /*!40000 ALTER TABLE `plc_log_proceso` ENABLE KEYS */;
+
+
+-- Dumping structure for table plc.plc_log_proceso_estado
+CREATE TABLE IF NOT EXISTS `plc_log_proceso_estado` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `id_proceso` int(10) NOT NULL,
+  `id_estado` int(10) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_proceso_s_proceso` (`id_proceso`),
+  KEY `fk_proceso_s_estado` (`id_estado`),
+  CONSTRAINT `fk_proceso_s_proceso` FOREIGN KEY (`id_proceso`) REFERENCES `plc_log_proceso` (`id`),
+  CONSTRAINT `fk_proceso_s_estado` FOREIGN KEY (`id_estado`) REFERENCES `plc_cfg_estado` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+
+-- Dumping data for table plc.plc_log_proceso_estado: ~8 rows (approximately)
+/*!40000 ALTER TABLE `plc_log_proceso_estado` DISABLE KEYS */;
+INSERT INTO `plc_log_proceso_estado` (`id`, `id_proceso`, `id_estado`) VALUES
+	(2, 24, 4),
+	(3, 25, 4),
+	(4, 26, 1),
+	(5, 27, 2),
+	(6, 28, 3),
+	(7, 29, 1),
+	(8, 30, 1),
+	(9, 31, 1);
+/*!40000 ALTER TABLE `plc_log_proceso_estado` ENABLE KEYS */;
 
 
 -- Dumping structure for table plc.plc_log_proceso_etapa
@@ -544,9 +618,9 @@ CREATE TABLE IF NOT EXISTS `plc_log_proceso_etapa` (
   KEY `fk_proceso_e_etapa` (`id_etapa`),
   CONSTRAINT `fk_proceso_e_etapa` FOREIGN KEY (`id_etapa`) REFERENCES `plc_cfg_etapa` (`id`),
   CONSTRAINT `fk_proceso_e_proceso` FOREIGN KEY (`id_proceso`) REFERENCES `plc_log_proceso` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=latin1;
 
--- Dumping data for table plc.plc_log_proceso_etapa: ~10 rows (approximately)
+-- Dumping data for table plc.plc_log_proceso_etapa: ~63 rows (approximately)
 /*!40000 ALTER TABLE `plc_log_proceso_etapa` DISABLE KEYS */;
 INSERT INTO `plc_log_proceso_etapa` (`id`, `id_proceso`, `id_etapa`, `f_fin`) VALUES
 	(7, 2, 1, '2013-04-04 16:32:12'),
@@ -564,7 +638,54 @@ INSERT INTO `plc_log_proceso_etapa` (`id`, `id_proceso`, `id_etapa`, `f_fin`) VA
 	(25, 21, 3, '2013-04-18 19:44:56'),
 	(26, 21, 4, '2013-04-18 19:45:26'),
 	(27, 21, 5, '2013-04-18 19:44:46'),
-	(28, 21, 6, '2013-04-18 19:45:06');
+	(28, 21, 6, '2013-04-18 19:45:06'),
+	(29, 22, 1, '2013-07-06 08:19:01'),
+	(30, 22, 2, '2013-07-06 08:19:21'),
+	(31, 22, 3, '2013-07-06 08:19:11'),
+	(32, 22, 4, '2013-07-06 08:19:26'),
+	(33, 22, 5, '2013-07-06 08:19:06'),
+	(34, 22, 6, '2013-07-06 08:19:16'),
+	(35, 23, 1, '2013-07-06 09:10:23'),
+	(36, 23, 2, '2013-07-06 09:10:43'),
+	(37, 23, 3, '2013-07-06 09:10:33'),
+	(38, 23, 4, '2013-07-06 09:10:48'),
+	(39, 23, 5, '2013-07-06 09:10:28'),
+	(40, 23, 6, '2013-07-06 09:10:38'),
+	(41, 24, 1, '2013-07-06 09:10:23'),
+	(42, 24, 2, '2013-07-06 09:10:43'),
+	(43, 24, 3, '2013-07-06 09:10:33'),
+	(44, 24, 4, '2013-07-06 09:10:48'),
+	(45, 24, 5, '2013-07-06 09:10:28'),
+	(46, 24, 6, '2013-07-06 09:10:38'),
+	(47, 25, 1, '2013-07-06 09:17:39'),
+	(48, 25, 2, '2013-07-06 09:17:59'),
+	(49, 25, 3, '2013-07-06 09:17:49'),
+	(50, 25, 4, '2013-07-06 09:18:04'),
+	(51, 25, 5, '2013-07-06 09:17:44'),
+	(52, 25, 6, '2013-07-06 09:17:54'),
+	(53, 26, 1, '2013-07-06 09:21:48'),
+	(54, 26, 2, '2013-07-06 09:22:08'),
+	(55, 26, 3, '2013-07-06 09:21:58'),
+	(56, 26, 4, '2013-07-06 09:22:13'),
+	(57, 26, 5, '2013-07-06 09:21:53'),
+	(58, 26, 6, '2013-07-06 09:22:03'),
+	(59, 29, 1, '2013-07-06 09:41:13'),
+	(60, 29, 2, '2013-07-06 09:41:33'),
+	(61, 29, 3, '2013-07-06 09:41:23'),
+	(62, 29, 4, '2013-07-06 09:41:38'),
+	(63, 29, 5, '2013-07-06 09:41:18'),
+	(64, 29, 6, '2013-07-06 09:41:28'),
+	(65, 30, 1, '2013-07-06 10:09:59'),
+	(66, 30, 2, '2013-07-06 10:10:39'),
+	(67, 30, 3, '2013-07-06 10:10:19'),
+	(68, 30, 4, '2013-07-06 10:10:49'),
+	(69, 30, 5, '2013-07-06 10:10:09'),
+	(70, 30, 6, '2013-07-06 10:10:29'),
+	(71, 31, 1, '2013-07-06 10:11:52'),
+	(72, 31, 2, '2013-07-06 10:12:22'),
+	(73, 31, 3, '2013-07-06 10:12:02'),
+	(74, 31, 4, '2013-07-06 10:12:32'),
+	(75, 31, 6, '2013-07-06 10:12:12');
 /*!40000 ALTER TABLE `plc_log_proceso_etapa` ENABLE KEYS */;
 
 
@@ -579,13 +700,33 @@ CREATE TABLE IF NOT EXISTS `plc_log_proceso_velocidad` (
   KEY `fk_log_v_proceso` (`id_proceso`),
   CONSTRAINT `fk_log_v_proceso` FOREIGN KEY (`id_proceso`) REFERENCES `plc_log_proceso` (`id`),
   CONSTRAINT `fk_log_v_velocidad` FOREIGN KEY (`id_velocidad`) REFERENCES `plc_cfg_velocidad` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;
 
--- Dumping data for table plc.plc_log_proceso_velocidad: ~0 rows (approximately)
+-- Dumping data for table plc.plc_log_proceso_velocidad: ~22 rows (approximately)
 /*!40000 ALTER TABLE `plc_log_proceso_velocidad` DISABLE KEYS */;
 INSERT INTO `plc_log_proceso_velocidad` (`id`, `id_proceso`, `id_velocidad`, `n_velocidad`) VALUES
 	(1, 21, 1, 1500),
-	(2, 21, 2, 3000);
+	(2, 21, 2, 3000),
+	(3, 22, 1, 1500),
+	(4, 22, 2, 3000),
+	(5, 23, 1, 1500),
+	(6, 23, 2, 3000),
+	(7, 24, 1, 1500),
+	(8, 24, 2, 3000),
+	(9, 25, 1, 1500),
+	(10, 25, 2, 3000),
+	(11, 26, 1, 1500),
+	(12, 26, 2, 3000),
+	(13, 27, 1, 1500),
+	(14, 27, 2, 3000),
+	(15, 28, 1, 1500),
+	(16, 28, 2, 3000),
+	(17, 29, 1, 1500),
+	(18, 29, 2, 3000),
+	(19, 30, 1, 1500),
+	(20, 30, 2, 3000),
+	(21, 31, 1, 1500),
+	(22, 31, 2, 3000);
 /*!40000 ALTER TABLE `plc_log_proceso_velocidad` ENABLE KEYS */;
 
 
