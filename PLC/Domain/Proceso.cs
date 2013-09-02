@@ -11,6 +11,7 @@ namespace PLC.Domain
         public Inicio inicio;
         public List<Etapa> etapas;
         public List<Velocidad> velocidades;
+        public Estado estado;
 
         public String getProducto()
         {

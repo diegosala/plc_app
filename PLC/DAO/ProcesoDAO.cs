@@ -79,6 +79,15 @@ namespace PLC.DAO
                     return false;
             }
 
+            MySqlCommand cmdEstado = new MySqlCommand("INSERT INTO plc_log_proceso_estado(id_proceso, id_estado) " +
+                                                "VALUES (@Proceso, @Valor)", conexion);
+
+            cmdEstado.Parameters.AddWithValue("@Proceso", idHeader);
+            cmdEstado.Parameters.AddWithValue("@Valor", Int16.Parse(proceso.estado.item.valor));
+
+            if (cmdEstado.ExecuteNonQuery() != 1)
+                return false;
+
             return true;
         }
     }

@@ -239,6 +239,28 @@ namespace PLC
             {
                 reader.Close();
             }
+        }        
+
+        public Estado getEstadoForBloque(int idBloque)
+        {
+            Estado estado = new Estado();
+            estado.idBloque = idBloque;
+
+            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_cfg_estadoxbloque WHERE id_bloque = " + estado.idBloque, conexion);
+            MySqlDataReader reader = query.ExecuteReader();
+
+            try
+            {
+                while (reader.Read())
+                {
+                    estado.item = new LogOPCItem((int)reader[0], estado.idBloque, (string)reader[2]);                    
+                }
+            }
+            finally
+            {
+                reader.Close();
+            }
+            return estado;
         }
     }
 }

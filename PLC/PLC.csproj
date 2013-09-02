@@ -58,6 +58,7 @@
     <Compile Include="Config\ControlConfig.cs" />
     <Compile Include="DAO\ProcesoDAO.cs" />
     <Compile Include="Domain\BussinesObject.cs" />
+    <Compile Include="Domain\Estado.cs" />
     <Compile Include="Domain\Etapa.cs" />
     <Compile Include="Domain\Inicio.cs" />
     <Compile Include="Domain\LogOPCGrupo.cs" />
