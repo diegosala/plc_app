@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
+using PLC.Helper;
+using PLC.Configuration;
 
 namespace PLC
 {
@@ -21,6 +23,19 @@ namespace PLC
         public FormLogin()
         {
             InitializeComponent();
+            txtPassword.KeyUp += new KeyEventHandler(txtPassword_KeyUp);
+
+            ConfigDB cfgDB = ConfigurationHelper.GetConfigDatabase();
+        }
+
+        private void txtPassword_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            // Determine whether the key entered is the F1 key. Display help if it is. 
+            if (e.KeyCode == Keys.Enter)
+            {
+                // Display a pop-up help topic to assist the user.
+                this.btnConectar_Click(sender, e);
+            }
         }
 
         private void btnConectar_Click(object sender, EventArgs e)

@@ -56,7 +56,7 @@
             this.txtServidor.Location = new System.Drawing.Point(89, 11);
             this.txtServidor.Name = "txtServidor";
             this.txtServidor.ReadOnly = true;
-            this.txtServidor.Size = new System.Drawing.Size(205, 20);
+            this.txtServidor.Size = new System.Drawing.Size(95, 20);
             this.txtServidor.TabIndex = 2;
             this.txtServidor.Text = "S7200.OPCServer";
             // 
@@ -64,7 +64,7 @@
             // 
             this.btnConectar.Location = new System.Drawing.Point(12, 114);
             this.btnConectar.Name = "btnConectar";
-            this.btnConectar.Size = new System.Drawing.Size(282, 25);
+            this.btnConectar.Size = new System.Drawing.Size(172, 25);
             this.btnConectar.TabIndex = 7;
             this.btnConectar.Text = "Conectar";
             this.btnConectar.UseVisualStyleBackColor = true;
@@ -76,7 +76,7 @@
             this.lblEstado});
             this.statusStrip1.Location = new System.Drawing.Point(0, 147);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(306, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(194, 22);
             this.statusStrip1.SizingGrip = false;
             this.statusStrip1.TabIndex = 12;
             this.statusStrip1.Text = "statusStrip1";
@@ -100,14 +100,16 @@
             // 
             this.txtOnLine.Location = new System.Drawing.Point(89, 37);
             this.txtOnLine.Name = "txtOnLine";
-            this.txtOnLine.Size = new System.Drawing.Size(205, 20);
+            this.txtOnLine.ReadOnly = true;
+            this.txtOnLine.Size = new System.Drawing.Size(95, 20);
             this.txtOnLine.TabIndex = 14;
             // 
             // txtReadEnable
             // 
             this.txtReadEnable.Location = new System.Drawing.Point(89, 62);
             this.txtReadEnable.Name = "txtReadEnable";
-            this.txtReadEnable.Size = new System.Drawing.Size(205, 20);
+            this.txtReadEnable.ReadOnly = true;
+            this.txtReadEnable.Size = new System.Drawing.Size(95, 20);
             this.txtReadEnable.TabIndex = 16;
             // 
             // label3
@@ -123,7 +125,8 @@
             // 
             this.txtMemoryPos.Location = new System.Drawing.Point(89, 88);
             this.txtMemoryPos.Name = "txtMemoryPos";
-            this.txtMemoryPos.Size = new System.Drawing.Size(205, 20);
+            this.txtMemoryPos.ReadOnly = true;
+            this.txtMemoryPos.Size = new System.Drawing.Size(95, 20);
             this.txtMemoryPos.TabIndex = 18;
             // 
             // label4
@@ -140,7 +143,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(306, 169);
+            this.ClientSize = new System.Drawing.Size(194, 169);
             this.Controls.Add(this.txtMemoryPos);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtReadEnable);

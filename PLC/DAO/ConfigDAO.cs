@@ -262,5 +262,52 @@ namespace PLC
             }
             return estado;
         }
+
+        public List<Retencion> getAllRetencionesForBloque(int idBloque)
+        {
+            List<Retencion> retenciones = new List<Retencion>();
+            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_cfg_retencion", conexion);
+            MySqlDataReader reader = query.ExecuteReader();
+
+            try
+            {
+                while (reader.Read())
+                {
+                    Retencion retencion = new Retencion();
+                    retencion.Id = (int)reader[0];
+                    retencion.nombre = (String)reader[1];
+                    retencion.idBloque = idBloque;
+
+                    retenciones.Add(retencion);
+                }
+            }
+            finally
+            {
+                reader.Close();
+            }
+
+            foreach (Retencion retencion in retenciones)
+                setItemsForRetencion(retencion);
+
+            return retenciones;
+        }
+
+        private void setItemsForRetencion(Retencion retencion)
+        {
+            MySqlCommand query = new MySqlCommand("SELECT * FROM plc_cfg_retencionxbloque WHERE id_retencion = " + retencion.Id + " AND id_bloque = " + retencion.idBloque, conexion);
+            MySqlDataReader reader = query.ExecuteReader();
+
+            try
+            {
+                while (reader.Read())
+                {
+                    retencion.item = new LogOPCItem((int)reader[0], retencion.idBloque, (string)reader[3]);
+                }
+            }
+            finally
+            {
+                reader.Close();
+            }
+        }        
     }
 }

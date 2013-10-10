@@ -20,6 +20,7 @@ using PLC.Domain;
 
 using System.Timers;
 using PLC.DAO;
+using log4net;
 
 namespace PLC
 {
@@ -39,6 +40,15 @@ namespace PLC
 
         private System.Timers.Timer timer;
 
+        private const int OFFSET_ITEMS_INICIO = 500;
+        private const int OFFSET_ITEMS_ETAPA = 1000;
+        private const int OFFSET_ITEMS_VELOCIDAD = 2000;
+        private const int OFFSET_ITEMS_CONTROL = 5000;
+        private const int OFFSET_ITEMS_RETENCION = 6500;
+        private const int OFFSET_ITEMS_ESTADO = 8000;
+
+        protected static readonly ILog log = LogManager.GetLogger("log");
+
         public FormMain(Conexion conexion)
         {
             InitializeComponent();
@@ -47,6 +57,7 @@ namespace PLC
 
         private void btnConectar_Click(object sender, EventArgs e)
         {
+            log4net.Config.XmlConfigurator.Configure();
             ConfigDAO configReader = new ConfigDAO(conexion.getConexion());            
             try
             {
@@ -59,6 +70,8 @@ namespace PLC
                 {
                     btnConectar.Enabled = false;
                     lblEstado.Text = "Conectando a servidor OPC...";
+
+
                 }
                 else
                 {
@@ -89,44 +102,53 @@ namespace PLC
                 return;
             }
 
-            cargarItemsConfiguracion();
-            cargarGruposItems();
+            try
+            {
 
-            timer = new System.Timers.Timer();            
-            timer.Interval = 1000;
-            timer.Enabled = true;
-            timer.Elapsed += new ElapsedEventHandler(procesar);
-                
+                cargarItemsControl();
+                cargarItemsProceso();
+
+                timer = new System.Timers.Timer();
+                timer.Interval = 1000;
+                timer.Enabled = true;
+                timer.Elapsed += new ElapsedEventHandler(procesar);
+
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error: " + ex.Message + "\nStack: " + ex.StackTrace);
+            }
             lblEstado.Text = "Conectado a servidor OPC";
         }
 
         #region Carga Inicial
-        private void cargarItemsConfiguracion()
+        private void cargarItemsControl()
         {
             this.OpcGroupControl = servidorOPC.AddGroup(new ConfigDAO(conexion.getConexion()).getGrupoConfiguracion().nombre, true, 900);
             OPCItemDef[] itemsOPCControl = new OPCItemDef[3];
 
             //Agregar MP
             LogOPCItem itemControlMP = configuracion.itemMemoryPointer;
-            itemsOPCControl[(int)ConfigDAO.IdItemsControl.MP - 1] = new OPCItemDef(itemControlMP.nombre, true, (int)ConfigDAO.IdItemsControl.MP + 5000, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
+            itemsOPCControl[(int)ConfigDAO.IdItemsControl.MP - 1] = new OPCItemDef(itemControlMP.nombre, true, (int)ConfigDAO.IdItemsControl.MP + OFFSET_ITEMS_CONTROL, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
 
             //Agregar OL
             LogOPCItem itemControlOL = configuracion.itemOnline;
-            itemsOPCControl[(int)ConfigDAO.IdItemsControl.OL - 1] = new OPCItemDef(itemControlOL.nombre, true, (int)ConfigDAO.IdItemsControl.OL + 5000, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
+            itemsOPCControl[(int)ConfigDAO.IdItemsControl.OL - 1] = new OPCItemDef(itemControlOL.nombre, true, (int)ConfigDAO.IdItemsControl.OL + OFFSET_ITEMS_CONTROL, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
 
             //Agregar RE
             LogOPCItem itemControlRE = configuracion.itemReadEnable;
-            itemsOPCControl[(int)ConfigDAO.IdItemsControl.RE - 1] = new OPCItemDef(itemControlRE.nombre, true, (int)ConfigDAO.IdItemsControl.RE + 5000, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
+            itemsOPCControl[(int)ConfigDAO.IdItemsControl.RE - 1] = new OPCItemDef(itemControlRE.nombre, true, (int)ConfigDAO.IdItemsControl.RE + OFFSET_ITEMS_CONTROL, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
 
             this.OpcGroupControl.AddItems(itemsOPCControl, out OPCItemResultsControl);
         }
 
-        private void cargarGruposItems()
+        private void cargarItemsProceso()
         {
             List<LogOPCItem> itemsCabecera;
             List<LogOPCItem> itemsInicio;
             List<LogOPCItem> itemsEtapas;
             List<LogOPCItem> itemsVelocidad;
+            List<LogOPCItem> itemsRetencion;
             List<LogOPCItem> itemsEstado;
 
             List<LogOPCGrupo> bloques = new LogOPCGrupoDAO(conexion.getConexion()).getAll();
@@ -179,6 +201,15 @@ namespace PLC
                     itemsVelocidad.Add(velocidad.item);
                 }
 
+                // Cargo items para las retenciones
+                List<Retencion> retenciones = new ConfigDAO(conexion.getConexion()).getAllRetencionesForBloque(bloque.Id);
+               
+                itemsRetencion = new List<LogOPCItem>();
+                foreach (Retencion retencion in retenciones)
+                {
+                    itemsRetencion.Add(retencion.item);
+                }
+
                 // Cargo items para los estados
                 Estado estado = new ConfigDAO(conexion.getConexion()).getEstadoForBloque(bloque.Id);
 
@@ -193,19 +224,22 @@ namespace PLC
                     itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
 
                 foreach (LogOPCItem item in itemsInicio)
-                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + 500, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
+                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + OFFSET_ITEMS_INICIO, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
 
-                foreach (LogOPCItem item in itemsEtapas)                
-                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + 1000, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
+                foreach (LogOPCItem item in itemsEtapas)
+                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + OFFSET_ITEMS_ETAPA, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
 
                 foreach (LogOPCItem item in itemsVelocidad)
-                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + 2000, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
+                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + OFFSET_ITEMS_VELOCIDAD, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
+
+                foreach (LogOPCItem item in itemsRetencion)
+                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + OFFSET_ITEMS_RETENCION, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
 
                 foreach (LogOPCItem item in itemsEstado)
-                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + 8000, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
+                    itemsOPC[nroItem++] = new OPCItemDef(item.nombre, true, item.Id + OFFSET_ITEMS_ESTADO, System.Runtime.InteropServices.VarEnum.VT_EMPTY);
                 
                 // Agrego los items OPC al grupo OPC
-                if ((itemsCabecera.Count > 0) || (itemsInicio.Count > 0) || (itemsEtapas.Count > 0) || (itemsVelocidad.Count > 0) || (itemsEstado.Count > 0))
+                if ((itemsCabecera.Count > 0) || (itemsInicio.Count > 0) || (itemsEtapas.Count > 0) || (itemsVelocidad.Count > 0) || (itemsRetencion.Count > 0) || (itemsEstado.Count > 0))
                     this.OpcGroups[nroGrupo].AddItems(itemsOPC, out OPCItemResults[nroGrupo]);
 
                 nroGrupo++;
@@ -302,6 +336,7 @@ namespace PLC
             Inicio inicio = new ConfigDAO(conexion.getConexion()).getInicioForBloque(nBloque);
             List<Etapa> etapas = new ConfigDAO(conexion.getConexion()).getAllEtapasForBloque(nBloque);
             List<Velocidad> velocidades = new ConfigDAO(conexion.getConexion()).getAllVelocidadesForBloque(nBloque);
+            List<Retencion> retenciones = new ConfigDAO(conexion.getConexion()).getAllRetencionesForBloque(nBloque);
             Estado estado = new ConfigDAO(conexion.getConexion()).getEstadoForBloque(nBloque);
 
             // Cargo cabecera
@@ -323,35 +358,42 @@ namespace PLC
 
             }
 
-            inicio.itemAnioInicio.valor = valoresItems[inicio.itemAnioInicio.Id + 500];
-            inicio.itemMesInicio.valor = valoresItems[inicio.itemMesInicio.Id + 500];
-            inicio.itemDiaInicio.valor = valoresItems[inicio.itemDiaInicio.Id + 500];
-            inicio.itemHoraInicio.valor = valoresItems[inicio.itemHoraInicio.Id + 500];
-            inicio.itemMinInicio.valor = valoresItems[inicio.itemMinInicio.Id + 500];
-            inicio.itemSegInicio.valor = valoresItems[inicio.itemSegInicio.Id + 500];
+            inicio.itemAnioInicio.valor = valoresItems[inicio.itemAnioInicio.Id + OFFSET_ITEMS_INICIO];
+            inicio.itemMesInicio.valor = valoresItems[inicio.itemMesInicio.Id + OFFSET_ITEMS_INICIO];
+            inicio.itemDiaInicio.valor = valoresItems[inicio.itemDiaInicio.Id + OFFSET_ITEMS_INICIO];
+            inicio.itemHoraInicio.valor = valoresItems[inicio.itemHoraInicio.Id + OFFSET_ITEMS_INICIO];
+            inicio.itemMinInicio.valor = valoresItems[inicio.itemMinInicio.Id + OFFSET_ITEMS_INICIO];
+            inicio.itemSegInicio.valor = valoresItems[inicio.itemSegInicio.Id + OFFSET_ITEMS_INICIO];
 
             // Cargo etapas
             foreach (Etapa etapa in etapas)
             {
-                etapa.itemAnioFin.valor = valoresItems[etapa.itemAnioFin.Id + 1000];
-                etapa.itemMesFin.valor = valoresItems[etapa.itemMesFin.Id + 1000];
-                etapa.itemDiaFin.valor = valoresItems[etapa.itemDiaFin.Id + 1000];
-                etapa.itemHoraFin.valor = valoresItems[etapa.itemHoraFin.Id + 1000];
-                etapa.itemMinFin.valor = valoresItems[etapa.itemMinFin.Id + 1000];
-                etapa.itemSegFin.valor = valoresItems[etapa.itemSegFin.Id + 1000];
+                etapa.itemAnioFin.valor = valoresItems[etapa.itemAnioFin.Id + OFFSET_ITEMS_ETAPA];
+                etapa.itemMesFin.valor = valoresItems[etapa.itemMesFin.Id + OFFSET_ITEMS_ETAPA];
+                etapa.itemDiaFin.valor = valoresItems[etapa.itemDiaFin.Id + OFFSET_ITEMS_ETAPA];
+                etapa.itemHoraFin.valor = valoresItems[etapa.itemHoraFin.Id + OFFSET_ITEMS_ETAPA];
+                etapa.itemMinFin.valor = valoresItems[etapa.itemMinFin.Id + OFFSET_ITEMS_ETAPA];
+                etapa.itemSegFin.valor = valoresItems[etapa.itemSegFin.Id + OFFSET_ITEMS_ETAPA];
             }
 
             // Cargo velocidades
             foreach (Velocidad velocidad in velocidades)
             {
-                velocidad.item.valor = valoresItems[velocidad.item.Id + 2000];
+                velocidad.item.valor = valoresItems[velocidad.item.Id + OFFSET_ITEMS_VELOCIDAD];
             }
 
-            estado.item.valor = valoresItems[estado.item.Id + 8000];
+            // Cargo retenciones
+            foreach (Retencion retencion in retenciones)
+            {
+                retencion.item.valor = valoresItems[retencion.item.Id + OFFSET_ITEMS_RETENCION];
+            }
+
+            estado.item.valor = valoresItems[estado.item.Id + OFFSET_ITEMS_ESTADO];
             
             p.etapas = etapas;
             p.inicio = inicio;
             p.velocidades = velocidades;
+            p.retenciones = retenciones;
             p.estado = estado;
 
             return p;
@@ -375,15 +417,15 @@ namespace PLC
                 String dataValueString = dataValue == null ? "BAD" : dataValue.ToString();
                 switch (arrayEstadoControl[estadoControlCont].HandleClient)
                 {
-                    case (int)ConfigDAO.IdItemsControl.MP + 5000:
+                    case (int)ConfigDAO.IdItemsControl.MP + OFFSET_ITEMS_CONTROL:
                         updateMemoryPos(dataValueString);
                         configuracion.getItemMemoryPointer().valor = dataValueString;
                         break;
-                    case (int)ConfigDAO.IdItemsControl.OL + 5000:
+                    case (int)ConfigDAO.IdItemsControl.OL + OFFSET_ITEMS_CONTROL:
                         updateOnline(dataValueString);
                         configuracion.getItemOnLine().valor = dataValueString;
                         break;
-                    case (int)ConfigDAO.IdItemsControl.RE + 5000:
+                    case (int)ConfigDAO.IdItemsControl.RE + OFFSET_ITEMS_CONTROL:
                         updateReadEnable(dataValueString);
                         configuracion.getItemReadEnable().valor = dataValueString;
                         break;
