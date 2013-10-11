@@ -26,26 +26,25 @@ namespace PLC.Helper
                 instance = (ConfigSection)config.Sections[section];
             return instance;
         }      
-
-        // Protect the connectionStrings section.
+        
         public static void ProtectConfiguration()
         {
             // Get the application configuration file.
             System.Configuration.Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
             // Get the section to protect.
-            ConfigurationSection connStrings = config.ConnectionStrings;
+            ConfigurationSection protectSection = config.AppSettings;
 
-            if (connStrings != null)
+            if (protectSection != null)
             {
-                if (!connStrings.SectionInformation.IsProtected)
+                if (!protectSection.SectionInformation.IsProtected)
                 {
-                    if (!connStrings.ElementInformation.IsLocked)
+                    if (!protectSection.ElementInformation.IsLocked)
                     {
                         // Protect the section.
-                        connStrings.SectionInformation.ProtectSection(provider);
+                        protectSection.SectionInformation.ProtectSection(provider);
 
-                        connStrings.SectionInformation.ForceSave = true;
+                        protectSection.SectionInformation.ForceSave = true;
                         config.Save(ConfigurationSaveMode.Full);
 
                     }
@@ -59,18 +58,18 @@ namespace PLC.Helper
             System.Configuration.Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
             // Get the section to unprotect.
-            ConfigurationSection connStrings = config.ConnectionStrings;
+            ConfigurationSection protectSection = config.AppSettings;
 
-            if (connStrings != null)
+            if (protectSection != null)
             {
-                if (connStrings.SectionInformation.IsProtected)
+                if (protectSection.SectionInformation.IsProtected)
                 {
-                    if (!connStrings.ElementInformation.IsLocked)
+                    if (!protectSection.ElementInformation.IsLocked)
                     {
                         // Unprotect the section.
-                        connStrings.SectionInformation.UnprotectSection();
+                        protectSection.SectionInformation.UnprotectSection();
 
-                        connStrings.SectionInformation.ForceSave = true;
+                        protectSection.SectionInformation.ForceSave = true;
                         config.Save(ConfigurationSaveMode.Full);
                     }
                 }
@@ -78,7 +77,7 @@ namespace PLC.Helper
         }
 
         static public ConfigDB GetConfigDatabase()
-        {
+        {            
             return ConfigSection("ConfigSection").ConfigDB;
         }
     }

@@ -79,6 +79,19 @@ namespace PLC.DAO
                     return false;
             }
 
+            foreach (Retencion retencion in proceso.retenciones)
+            {
+                MySqlCommand cmdVelocidad = new MySqlCommand("INSERT INTO plc_log_proceso_retencion(id_proceso, id_retencion, v_retencion) " +
+                                                "VALUES (@Proceso, @Retencion, @Valor)", conexion);
+
+                cmdVelocidad.Parameters.AddWithValue("@Proceso", idHeader);
+                cmdVelocidad.Parameters.AddWithValue("@Retencion", retencion.Id);
+                cmdVelocidad.Parameters.AddWithValue("@Valor", retencion.item.valor);
+
+                if (cmdVelocidad.ExecuteNonQuery() != 1)
+                    return false;
+            }
+
             MySqlCommand cmdEstado = new MySqlCommand("INSERT INTO plc_log_proceso_estado(id_proceso, id_estado) " +
                                                 "VALUES (@Proceso, @Valor)", conexion);
 

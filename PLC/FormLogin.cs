@@ -15,6 +15,7 @@ namespace PLC
     public partial class FormLogin : Form
     {
         private readonly Conexion conexion;
+        private bool cambiosParametrosConexion = false;
 
         public delegate void LoginHandler(Conexion conexion);
 
@@ -23,9 +24,22 @@ namespace PLC
         public FormLogin()
         {
             InitializeComponent();
+            txtDB.KeyUp += new KeyEventHandler(txtParametrosConexion_KeyUp);
+            txtHost.KeyUp += new KeyEventHandler(txtParametrosConexion_KeyUp);
+            txtPuerto.KeyUp += new KeyEventHandler(txtParametrosConexion_KeyUp);
+            txtUsuario.KeyUp += new KeyEventHandler(txtParametrosConexion_KeyUp);
             txtPassword.KeyUp += new KeyEventHandler(txtPassword_KeyUp);
 
             ConfigDB cfgDB = ConfigurationHelper.GetConfigDatabase();
+            txtDB.Text = cfgDB.db;
+            txtHost.Text = cfgDB.host;
+            txtPassword.Text = cfgDB.pass;
+            txtPuerto.Text = cfgDB.port;
+            txtUsuario.Text = cfgDB.user;
+        }
+
+        private void txtParametrosConexion_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e) {
+            this.cambiosParametrosConexion = true;
         }
 
         private void txtPassword_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
@@ -35,6 +49,10 @@ namespace PLC
             {
                 // Display a pop-up help topic to assist the user.
                 this.btnConectar_Click(sender, e);
+            }
+            else
+            {
+                this.cambiosParametrosConexion = true;
             }
         }
 
@@ -64,9 +82,31 @@ namespace PLC
         {
             Conexion cnx = new Conexion(txtHost.Text, txtPuerto.Text, txtDB.Text, txtUsuario.Text, txtPassword.Text);
             if (cnx.getConexion() == null)
-                 e.Result = "No se ha podido conectar con la base de datos";
+                e.Result = "No se ha podido conectar con la base de datos";
             else
+            {
                 e.Result = cnx;
+                if (!this.cambiosParametrosConexion)
+                    return;
+                
+                DialogResult opcion = MessageBox.Show("¿Desea guardar la configuración?", "Configuración", MessageBoxButtons.OKCancel);
+                
+                if (opcion == DialogResult.OK)
+                {
+                    ConfigDB configDB = ConfigurationHelper.GetConfigDatabase();
+
+                    var configDBSection = new ConfigSection();
+
+                    configDB.db = txtDB.Text;
+                    configDB.host = txtHost.Text;
+                    configDB.pass = txtPassword.Text;
+                    configDB.port = txtPuerto.Text;
+                    configDB.user = txtUsuario.Text;
+
+                    configDBSection.ConfigDB = configDB;
+                    configDBSection.Save();
+                }                
+            }
         }
 
         private void progressBarUpdater(string text)
