@@ -58,7 +58,7 @@
             this.txtServidor.ReadOnly = true;
             this.txtServidor.Size = new System.Drawing.Size(95, 20);
             this.txtServidor.TabIndex = 2;
-            this.txtServidor.Text = "S7200.OPCServer";
+            this.txtServidor.Text = "S7-1200-Collete";
             // 
             // btnConectar
             // 

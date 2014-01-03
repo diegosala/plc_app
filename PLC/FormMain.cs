@@ -217,7 +217,7 @@ namespace PLC
                 itemsEstado.Add(estado.item);
 
                 // Genero arreglo de items OPC y agrego los items de cabecera y etapas
-                OPCItemDef[] itemsOPC = new OPCItemDef[itemsCabecera.Count + itemsInicio.Count + itemsEtapas.Count +  itemsVelocidad.Count + itemsEstado.Count];
+                OPCItemDef[] itemsOPC = new OPCItemDef[itemsCabecera.Count + itemsInicio.Count + itemsEtapas.Count +  itemsVelocidad.Count + itemsRetencion.Count + itemsEstado.Count];
 
                 int nroItem = 0;
                 foreach (LogOPCItem item in itemsCabecera)
