@@ -43,9 +43,9 @@ namespace PLC
         private const int OFFSET_ITEMS_INICIO = 500;
         private const int OFFSET_ITEMS_ETAPA = 1000;
         private const int OFFSET_ITEMS_VELOCIDAD = 2000;
-        private const int OFFSET_ITEMS_CONTROL = 5000;
-        private const int OFFSET_ITEMS_RETENCION = 6500;
-        private const int OFFSET_ITEMS_ESTADO = 8000;
+        private const int OFFSET_ITEMS_CONTROL = 3000;
+        private const int OFFSET_ITEMS_RETENCION = 4000;
+        private const int OFFSET_ITEMS_ESTADO = 6000;
 
         protected static readonly ILog log = LogManager.GetLogger("log");
 
@@ -268,11 +268,20 @@ namespace PLC
             {
                 // Consultar MP, si es diferente de 0
                 int mp = int.Parse(configuracion.getItemMemoryPointer().valor);                                
-                if (mp > 0 && mp <= 5)
+                if (mp > 0 && mp <= 3)
                 {
-                    Proceso proceso = leerBloque(mp);
-                    if (new ProcesoDAO(conexion.getConexion()).save(proceso))
-                        decrementarMP();
+                    try
+                    {
+                        Proceso proceso = leerBloque(mp);
+
+                        if (new ProcesoDAO(conexion.getConexion()).save(proceso))
+                            decrementarMP();
+                    }
+                    catch (Exception exc)
+                    {
+                        //MessageBox.Show(this, exc.Message + "\n" + exc.StackTrace, "Error al leer el proceso", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        log.Error("Error: " + exc.Message + "\nStack: " + exc.StackTrace);
+                    }
                 }
             }
 
@@ -328,36 +337,39 @@ namespace PLC
             Dictionary<int, String> valoresItems = new Dictionary<int, String>();
             
             // Guardo los valores de todos los items leidos para el bloque
-            for (int i = 0; i < arrayEstado.Length; i++)            
-                valoresItems[arrayEstado[i].HandleClient] = arrayEstado[i].DataValue == null ? "BAD" : arrayEstado[i].DataValue.ToString();
-
-            // Cargo los valores en el proceso            
-            List<LogOPCItem> cabecera = new ConfigDAO(conexion.getConexion()).getItemsCabeceraForBloque(nBloque);
-            Inicio inicio = new ConfigDAO(conexion.getConexion()).getInicioForBloque(nBloque);
-            List<Etapa> etapas = new ConfigDAO(conexion.getConexion()).getAllEtapasForBloque(nBloque);
-            List<Velocidad> velocidades = new ConfigDAO(conexion.getConexion()).getAllVelocidadesForBloque(nBloque);
-            List<Retencion> retenciones = new ConfigDAO(conexion.getConexion()).getAllRetencionesForBloque(nBloque);
-            Estado estado = new ConfigDAO(conexion.getConexion()).getEstadoForBloque(nBloque);
-
-            // Cargo cabecera
-            for (int i = 1; i <= 3; i++)
+            for (int i = 0; i < arrayEstado.Length; i++)
             {
-                String v = valoresItems[i];
-                switch (i)
+                try
                 {
-                    case 1:
-                        p.producto = v;
-                        break;
-                    case 2:
-                        p.lote = v;
-                        break;
-                    case 3:
-                        p.operario = v;
-                        break; 
+                    valoresItems[arrayEstado[i].HandleClient] = arrayEstado[i].DataValue == null ? "BAD" : arrayEstado[i].DataValue.ToString();
                 }
-
+                catch (Exception ex)
+                {                    
+                    throw new Exception("Carga item " + arrayEstado[i].HandleClient + ", valor: " + arrayEstado[i].DataValue == null ? "BAD" : arrayEstado[i].DataValue.ToString(), ex);
+                }                
             }
+            
+            // Cargo los valores en el proceso                        
+            List<LogOPCItem> cabecera = new ConfigDAO(conexion.getConexion()).getItemsCabeceraForBloque(nBloque);           
+            Inicio inicio = new ConfigDAO(conexion.getConexion()).getInicioForBloque(nBloque);            
+            List<Etapa> etapas = new ConfigDAO(conexion.getConexion()).getAllEtapasForBloque(nBloque);            
+            List<Velocidad> velocidades = new ConfigDAO(conexion.getConexion()).getAllVelocidadesForBloque(nBloque);            
+            List<Retencion> retenciones = new ConfigDAO(conexion.getConexion()).getAllRetencionesForBloque(nBloque);            
+            Estado estado = new ConfigDAO(conexion.getConexion()).getEstadoForBloque(nBloque);
+            
+            /*
+            MessageBox.Show("Va a cargar cabecera", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Va a cargar cabecera", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Producto " + cabecera[0].Id, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Lote " + cabecera[1].Id, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Opreario: " + cabecera[2].Id, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            */
 
+            p.producto = valoresItems[cabecera[0].Id];
+            p.lote = valoresItems[cabecera[1].Id];
+            p.operario = valoresItems[cabecera[2].Id];
+
+            //MessageBox.Show("Carga inicio", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
             inicio.itemAnioInicio.valor = valoresItems[inicio.itemAnioInicio.Id + OFFSET_ITEMS_INICIO];
             inicio.itemMesInicio.valor = valoresItems[inicio.itemMesInicio.Id + OFFSET_ITEMS_INICIO];
             inicio.itemDiaInicio.valor = valoresItems[inicio.itemDiaInicio.Id + OFFSET_ITEMS_INICIO];
@@ -368,6 +380,7 @@ namespace PLC
             // Cargo etapas
             foreach (Etapa etapa in etapas)
             {
+                //MessageBox.Show("Carga etapa " + etapa.idBloque, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 etapa.itemAnioFin.valor = valoresItems[etapa.itemAnioFin.Id + OFFSET_ITEMS_ETAPA];
                 etapa.itemMesFin.valor = valoresItems[etapa.itemMesFin.Id + OFFSET_ITEMS_ETAPA];
                 etapa.itemDiaFin.valor = valoresItems[etapa.itemDiaFin.Id + OFFSET_ITEMS_ETAPA];
@@ -379,12 +392,14 @@ namespace PLC
             // Cargo velocidades
             foreach (Velocidad velocidad in velocidades)
             {
+                //MessageBox.Show("Carga velocidad " + velocidad.idBloque, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 velocidad.item.valor = valoresItems[velocidad.item.Id + OFFSET_ITEMS_VELOCIDAD];
             }
 
             // Cargo retenciones
             foreach (Retencion retencion in retenciones)
             {
+                //MessageBox.Show("Carga retencion " + retencion.idBloque, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 retencion.item.valor = valoresItems[retencion.item.Id + OFFSET_ITEMS_RETENCION];
             }
 
