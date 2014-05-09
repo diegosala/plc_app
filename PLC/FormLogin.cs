@@ -36,6 +36,8 @@ namespace PLC
             txtPassword.Text = cfgDB.pass;
             txtPuerto.Text = cfgDB.port;
             txtUsuario.Text = cfgDB.user;
+
+            this.conectar();
         }
 
         private void txtParametrosConexion_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e) {
@@ -56,7 +58,7 @@ namespace PLC
             }
         }
 
-        private void btnConectar_Click(object sender, EventArgs e)
+        private void conectar()
         {
             if (GetUserBacgroundWorker.IsBusy)
                 return;
@@ -65,6 +67,11 @@ namespace PLC
             BackgroundWorker Worker = new BackgroundWorker();
             Worker.DoWork += new DoWorkEventHandler(this.UpdateProgressBar);
             Worker.RunWorkerAsync("Validando...");
+        }
+
+        private void btnConectar_Click(object sender, EventArgs e)
+        {
+            this.conectar();
         }
 
         private void UpdateProgressBar(object sender, DoWorkEventArgs e)
@@ -78,19 +85,76 @@ namespace PLC
             }
         }
 
+        private void lockFields()
+        {
+            this.enableFields(false);
+        }
+
+        private void unlockFields()
+        {
+            this.enableFields(true);
+        }
+
+        private void disableField(TextBox field)
+        {
+            field.Enabled = false;
+        }
+
+        private void enableField(TextBox field) 
+        {
+            field.Enabled = true;
+        }
+
+        private void threadSafeEnableField(TextBox field, Boolean enabled)
+        {
+            if (field.InvokeRequired)
+            {
+                if (enabled)
+                    field.Invoke(new Action<TextBox>(enableField), new Object[] { field });
+                else
+                    field.Invoke(new Action<TextBox>(disableField), new Object[] { field });
+            }
+            else
+            {
+                field.Enabled = enabled;
+            }
+        }
+
+        private void enableFields(Boolean enabled)
+        {
+            threadSafeEnableField(txtHost, enabled);
+            threadSafeEnableField(txtPuerto, enabled);
+            threadSafeEnableField(txtDB, enabled);
+            threadSafeEnableField(txtUsuario, enabled);
+            threadSafeEnableField(txtPassword, enabled);
+        }
+
         private void getConexion(object sender, DoWorkEventArgs e)
         {
-            Conexion cnx = new Conexion(txtHost.Text, txtPuerto.Text, txtDB.Text, txtUsuario.Text, txtPassword.Text);
+            int maxReintentosDB = 10;
+            int reintentosDB = 0;
+            this.lockFields();
+            
+            Conexion cnx = new Conexion(txtHost.Text, txtPuerto.Text, txtDB.Text, txtUsuario.Text, txtPassword.Text);                        
+            
+            while ((cnx.getConexion() == null) && (reintentosDB++ < maxReintentosDB)) {
+                txtStatus.Text = "Intento de conexión " + reintentosDB + " de " + maxReintentosDB;
+                Thread.Sleep(2000);
+            }
+            
             if (cnx.getConexion() == null)
+            {
                 e.Result = "No se ha podido conectar con la base de datos";
+                this.unlockFields();
+            }
             else
             {
                 e.Result = cnx;
                 if (!this.cambiosParametrosConexion)
                     return;
-                
+
                 DialogResult opcion = MessageBox.Show("¿Desea guardar la configuración?", "Configuración", MessageBoxButtons.OKCancel);
-                
+
                 if (opcion == DialogResult.OK)
                 {
                     ConfigDB configDB = ConfigurationHelper.GetConfigDatabase();
@@ -105,7 +169,7 @@ namespace PLC
 
                     configDBSection.ConfigDB = configDB;
                     configDBSection.Save();
-                }                
+                }
             }
         }
 

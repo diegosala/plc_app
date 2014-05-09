@@ -41,9 +41,12 @@
             this.btnConectar = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.prgBar = new System.Windows.Forms.ProgressBar();
-            this.groupBox1.SuspendLayout();
-            this.SuspendLayout();
             this.GetUserBacgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.txtStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.groupBox1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
+            this.SuspendLayout();
             // 
             // label1
             // 
@@ -169,11 +172,32 @@
             this.prgBar.TabIndex = 11;
             this.prgBar.Visible = false;
             // 
+            // GetUserBacgroundWorker
+            // 
+            this.GetUserBacgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.getConexion);
+            this.GetUserBacgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.WorkDone);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.txtStatus});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 210);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(261, 22);
+            this.statusStrip1.TabIndex = 12;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // txtStatus
+            // 
+            this.txtStatus.Name = "txtStatus";
+            this.txtStatus.Size = new System.Drawing.Size(0, 17);
+            // 
             // FormLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(261, 211);
+            this.ClientSize = new System.Drawing.Size(261, 232);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -182,10 +206,11 @@
             this.Text = "PLC";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
-            this.GetUserBacgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.getConexion);
-            this.GetUserBacgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.WorkDone);
         }
 
         #endregion
@@ -204,5 +229,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ProgressBar prgBar;
         private System.ComponentModel.BackgroundWorker GetUserBacgroundWorker;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel txtStatus;
     }
 }

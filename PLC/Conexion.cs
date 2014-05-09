@@ -17,6 +17,8 @@ namespace PLC
         private String password;
         private String db;
         private String puerto;
+
+        public int reintentos = 0;
         
         private MySqlConnection conexion;
 

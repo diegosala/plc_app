@@ -21,6 +21,7 @@ using PLC.Domain;
 using System.Timers;
 using PLC.DAO;
 using log4net;
+using System.Threading;
 
 namespace PLC
 {
@@ -47,18 +48,24 @@ namespace PLC
         private const int OFFSET_ITEMS_RETENCION = 4000;
         private const int OFFSET_ITEMS_ESTADO = 6000;
 
+        private Boolean mutexProcesando;
+
         protected static readonly ILog log = LogManager.GetLogger("log");
 
         public FormMain(Conexion conexion)
         {
             InitializeComponent();
             this.conexion = conexion;
+
+            btnConectar.Enabled = false;
+            if (!this.conectarPCAccess())
+                btnConectar.Enabled = true;            
         }
 
-        private void btnConectar_Click(object sender, EventArgs e)
+        private Boolean conectarPCAccess()
         {
             log4net.Config.XmlConfigurator.Configure();
-            ConfigDAO configReader = new ConfigDAO(conexion.getConexion());            
+            ConfigDAO configReader = new ConfigDAO(conexion.getConexion());
             try
             {
                 SERVERSTATUS estadoServidor;
@@ -70,26 +77,25 @@ namespace PLC
                 {
                     btnConectar.Enabled = false;
                     lblEstado.Text = "Conectando a servidor OPC...";
-
-
                 }
                 else
                 {
                     throw new Exception("Error");
+                    return false;
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "No se pudo conectar al servidor OPC", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                btnConectar.Enabled = true;                
+                btnConectar.Enabled = true;
                 lblEstado.Text = "Inactivo";
-                return;
+                return false;
             }
-            
+
             try
             {
                 lblEstado.Text = "Cargando configuración...";
-                configuracion = new ControlConfig();                
+                configuracion = new ControlConfig();
                 configuracion.setItemMemoryPointer(configReader.getItemConfiguracion(ConfigDAO.IdItemsControl.MP, conexion.getConexion()));
                 configuracion.setItemOnLine(configReader.getItemConfiguracion(ConfigDAO.IdItemsControl.OL, conexion.getConexion()));
                 configuracion.setItemReadEnable(configReader.getItemConfiguracion(ConfigDAO.IdItemsControl.RE, conexion.getConexion()));
@@ -99,26 +105,32 @@ namespace PLC
                 MessageBox.Show(ex.Message, "No se pudo cargar la configuración", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 btnConectar.Enabled = true;
                 lblEstado.Text = "Inactivo";
-                return;
+                return false;
             }
 
             try
             {
-
                 cargarItemsControl();
                 cargarItemsProceso();
 
                 timer = new System.Timers.Timer();
                 timer.Interval = 1000;
                 timer.Enabled = true;
-                timer.Elapsed += new ElapsedEventHandler(procesar);
-
+                timer.Elapsed += new ElapsedEventHandler(procesar);                
             }
             catch (Exception ex)
             {
                 log.Error("Error: " + ex.Message + "\nStack: " + ex.StackTrace);
+                return false;
             }
+
             lblEstado.Text = "Conectado a servidor OPC";
+            return true;
+        }
+
+        private void btnConectar_Click(object sender, EventArgs e)
+        {
+            this.conectarPCAccess();
         }
 
         #region Carga Inicial
@@ -250,6 +262,47 @@ namespace PLC
         #region Algoritmo principal
         private void procesar(object source, ElapsedEventArgs e)
         {
+            int maxReintentosDB = 100;
+            if (mutexProcesando)
+                return;
+
+            mutexProcesando = true;
+
+            this.conexion.getConexion().Ping();
+            if (this.conexion.getConexion().State != ConnectionState.Open)
+            {
+                log.Warn("Conexion cerrada, reabriendo...");
+                try
+                {
+                    this.conexion.getConexion().Open();
+                }
+                catch (MySqlException MysqlE)
+                {
+                    log.Warn("No se pudo conectar (" + this.conexion.reintentos + " / " + maxReintentosDB  + ")...");
+                    this.conexion.reintentos++;
+                    
+                    Thread.Sleep(2000);
+                    
+                    if (this.conexion.reintentos > maxReintentosDB)
+                    {
+                        this.timer.Enabled = false;
+                        if (MessageBox.Show("Se ha perdido la conexión con la base de datos tras " + maxReintentosDB  + " reintentos.\nHaga click en Aceptar para reintentar la conexión nuevamente", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error) == DialogResult.OK)
+                        {
+                            log.Info("Reintentando manualmente...");                
+                            this.conexion.reintentos = 0;
+                            this.timer.Enabled = true;
+                            mutexProcesando = false;
+                            return;
+                        }
+                    }
+
+                    mutexProcesando = false;
+                    return;
+                }
+                
+                log.Info("Conexion reabierta");                
+            }
+            
             timer.Enabled = false;
             leerValoresControl();
 
@@ -260,6 +313,7 @@ namespace PLC
             if (configuracion.getItemReadEnable().valor == "False")
             {
                 timer.Enabled = true;
+                mutexProcesando = false;
                 return;
             }
 
@@ -281,11 +335,13 @@ namespace PLC
                     {
                         //MessageBox.Show(this, exc.Message + "\n" + exc.StackTrace, "Error al leer el proceso", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         log.Error("Error: " + exc.Message + "\nStack: " + exc.StackTrace);
+                        mutexProcesando = false;
                     }
                 }
             }
 
             timer.Enabled = true;
+            mutexProcesando = false;
         }
 
         private void setOnline()
@@ -355,21 +411,12 @@ namespace PLC
             List<Etapa> etapas = new ConfigDAO(conexion.getConexion()).getAllEtapasForBloque(nBloque);            
             List<Velocidad> velocidades = new ConfigDAO(conexion.getConexion()).getAllVelocidadesForBloque(nBloque);            
             List<Retencion> retenciones = new ConfigDAO(conexion.getConexion()).getAllRetencionesForBloque(nBloque);            
-            Estado estado = new ConfigDAO(conexion.getConexion()).getEstadoForBloque(nBloque);
-            
-            /*
-            MessageBox.Show("Va a cargar cabecera", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            MessageBox.Show("Va a cargar cabecera", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            MessageBox.Show("Producto " + cabecera[0].Id, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            MessageBox.Show("Lote " + cabecera[1].Id, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            MessageBox.Show("Opreario: " + cabecera[2].Id, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            */
+            Estado estado = new ConfigDAO(conexion.getConexion()).getEstadoForBloque(nBloque);           
 
             p.producto = valoresItems[cabecera[0].Id];
             p.lote = valoresItems[cabecera[1].Id];
             p.operario = valoresItems[cabecera[2].Id];
-
-            //MessageBox.Show("Carga inicio", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            
             inicio.itemAnioInicio.valor = valoresItems[inicio.itemAnioInicio.Id + OFFSET_ITEMS_INICIO];
             inicio.itemMesInicio.valor = valoresItems[inicio.itemMesInicio.Id + OFFSET_ITEMS_INICIO];
             inicio.itemDiaInicio.valor = valoresItems[inicio.itemDiaInicio.Id + OFFSET_ITEMS_INICIO];
@@ -379,8 +426,7 @@ namespace PLC
 
             // Cargo etapas
             foreach (Etapa etapa in etapas)
-            {
-                //MessageBox.Show("Carga etapa " + etapa.idBloque, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            {                
                 etapa.itemAnioFin.valor = valoresItems[etapa.itemAnioFin.Id + OFFSET_ITEMS_ETAPA];
                 etapa.itemMesFin.valor = valoresItems[etapa.itemMesFin.Id + OFFSET_ITEMS_ETAPA];
                 etapa.itemDiaFin.valor = valoresItems[etapa.itemDiaFin.Id + OFFSET_ITEMS_ETAPA];
@@ -391,15 +437,13 @@ namespace PLC
 
             // Cargo velocidades
             foreach (Velocidad velocidad in velocidades)
-            {
-                //MessageBox.Show("Carga velocidad " + velocidad.idBloque, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            {                
                 velocidad.item.valor = valoresItems[velocidad.item.Id + OFFSET_ITEMS_VELOCIDAD];
             }
 
             // Cargo retenciones
             foreach (Retencion retencion in retenciones)
-            {
-                //MessageBox.Show("Carga retencion " + retencion.idBloque, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            {                
                 retencion.item.valor = valoresItems[retencion.item.Id + OFFSET_ITEMS_RETENCION];
             }
 
